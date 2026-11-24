@@ -62,10 +62,14 @@ Options not mentioned in this list may be safely ignored.
 |call_packet_timeout_ms|Integer|No|The maximum time to wait for call packet delivery to be passed to tgcalls|
 |can_accept_calls|Boolean|No|*Since TDLib 1.8.48*. If true, the user can accept calls from this device|
 |can_archive_and_mute_new_chats_from_unknown_users|Boolean|No|If true, new chats from unknown users can be automatically archived and muted via `archiveChatListSettings`|
+|can_buy_on_chain_fixed_price_gifts|Boolean|No|*Since TDLib 1.8.71*. If true, then the current user can buy upgraded gifts that are sold on-chain using a fixed-price sale contract|
+|can_buy_on_chain_gifts|Boolean|No|*Since TDLib 1.8.71*. If true, then the current user can buy upgraded gifts that are sold on-chain on Fragment|
+|can_craft_with_minted_first_gift|Boolean|No|*Since TDLib 1.8.71*. If true, then a minted gift can be used as the first gift for crafting|
 |can_enable_paid_messages|Boolean|No|*Since TDLib 1.8.46*. If true, the user can enable paid messages|
 |can_gift_stars|Boolean|No|*Since TDLib 1.8.34*. If true, Telegram Stars can be gifted to other users|
 |can_ignore_sensitive_content_restrictions|Boolean|No|If true, the option "ignore_sensitive_content_restrictions" can be changed|
 |can_preload_weather|Boolean|No|*Since TDLib 1.8.34*. If true, the current weather must be preloaded before adding the media area to the story. Otherwise, weather must be loaded only after the user has chosen weather media area.|
+|can_recognize_speech|Boolean|No|*Since TDLib 1.8.71*. If true, then the current user can recognize speech in audio files without the speech recognition trial|
 |can_set_new_chat_privacy_settings|Boolean|No|*Since TDLib 1.8.28*. If true, then the current user can change privacy settings for new chats|
 |can_use_login_passkey|Boolean|No|*Since TDLib 1.8.59*. If true, then passkey can be used to log in and new passkeys can be added|
 |can_use_text_entities_in_story_caption|Boolean|No|*Since TDLib 1.8.24*. If true, then the current user can use text entities in story captions|
@@ -110,7 +114,6 @@ Options not mentioned in this list may be safely ignored.
 |giveaway_boost_count_per_premium|Integer|No|*Since TDLib 1.8.24*. The number of boosts that received by the channel for each giveaway prize|
 |giveaway_country_count_max|Integer|No|*Since TDLib 1.8.24*. The maximum number of countries that can be added to a giveaway|
 |giveaway_duration_max|Integer|No|*Since TDLib 1.8.24*. The maximum number of additional chats that can be added to a giveaway|
-|gram_top_up_url|String|No|*Since TDLib 1.8.65*. The URL that can be used to top up TON Gram balance of the current user|
 |group_anonymous_bot_user_id|Integer|No|Identifier of the bot which is shown as the sender of anonymous messages in groups when viewed from an outdated client|
 |group_call_message_text_length_max|Integer|No|*Since TDLib 1.8.56*. The maximum length of a message text in a group call that isn't a live story|
 |group_call_participant_count_max|Integer|No|*Since TDLib 1.8.48*. The maximum number of participants in a group call that is not bound to a chat|
@@ -156,6 +159,10 @@ Options not mentioned in this list may be safely ignored.
 |rich_message_table_column_count_max|Integer|No|*Since TDLib 1.8.65*. The maximum number of columns in a table of a rich message|
 |rich_message_text_length_max|Integer|No|*Since TDLib 1.8.65*. The maximum length of a rich message text|
 |secondary_bot_username_count_max|Integer|No|*Since TDLib 1.8.68*. The maximum number of bots with a secondary username that can be owned by a Premium user|
+|select_gift_resale_gram_filter_by_default|Boolean|No|*Since TDLib 1.8.71*. If true, then the filter for gifts that can be bought using TON Grams must be selected by default in the list of gifts for resale|
+|select_gift_resale_star_filter_by_default|Boolean|No|*Since TDLib 1.8.71*. If true, then the filter for gifts that can be bought using Telegram Stars must be selected by default in the list of gifts for resale|
+|show_gift_resale_gram_filter|Boolean|No|*Since TDLib 1.8.71*. If true, then the filter for gifts that can be bought using TON Grams must be shown in the list of gifts for resale|
+|show_gift_resale_star_filter|Boolean|No|*Since TDLib 1.8.71*. If true, then the filter for gifts that can be bought using Telegram Stars must be shown in the list of gifts for resale|
 |show_message_edit_date_by_default|Boolean|No|If true, then message edit date must be shown along the message instead of the message send date|
 |stake_dice_stake_amount_max|Integer|No|*Since TDLib 1.8.60*. The maximum amount of TON Grams that can be staked for a roll in nanograms|
 |stake_dice_stake_amount_min|Integer|No|*Since TDLib 1.8.60*. The minimum amount of TON Grams that can be staked for a roll in nanograms|

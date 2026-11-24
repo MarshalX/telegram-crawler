@@ -65,14 +65,14 @@ Types of this section are listed at [Bot API types](/bots/api/types.md#getting-u
 - [getUpdates](/bots/api/methods/getupdates.md): receive incoming updates using long polling (wiki).
 - [setWebhook](/bots/api/methods/setwebhook.md): specify a URL and receive incoming updates via an outgoing webhook.
 - [deleteWebhook](/bots/api/methods/deletewebhook.md): remove webhook integration if you decide to switch back to getUpdates.
-- [getWebhookInfo](/bots/api/methods/getwebhookinfo.md): get current webhook status.
+- [getWebhookInfo](/bots/api/methods/getwebhookinfo.md): get the current webhook status.
 
 ### Available types
-All types used in the Bot API responses are represented as JSON-objects.
+All types used in the Bot API responses are represented as JSON objects.
 
 It is safe to use 32-bit signed integers for storing all **Integer** fields unless otherwise noted.
 
->**Optional** fields may be not returned when irrelevant.
+>**Optional** fields may not be returned when irrelevant.
 
 Types of this section are listed at [Bot API types](/bots/api/types.md#available-types).
 
@@ -108,7 +108,7 @@ The following algorithm is used to determine the list of commands for a particul
 
 There are three ways to send files (photos, stickers, audio, media, etc.):
 
-1. If the file is already stored somewhere on the Telegram servers, you don't need to reupload it: each file object has a **file_id** field, simply pass this **file_id** as a parameter instead of uploading. There are **no limits** for files sent this way.
+1. If the file is already stored somewhere on the Telegram servers, you don't need to reupload it: each file object has a **file_id** field; simply pass this **file_id** as a parameter instead of uploading. There are **no limits** for files sent this way.
 2. Provide Telegram with an HTTP URL for the file to be sent. Telegram will download and send the file. 5 MB max size for photos and 20 MB max for other types of content.
 3. Post the file using multipart/form-data in the usual way that files are uploaded via the browser. 10 MB max size for photos, 50 MB for other files.
 
@@ -178,7 +178,7 @@ Objects and methods used in the inline mode are described in the [Inline mode se
 ### Available methods
 
 >All methods in the Bot API are case-insensitive. We support **GET** and **POST** HTTP methods. Use either [URL query string](https://en.wikipedia.org/wiki/Query_string) or *application/json* or *application/x-www-form-urlencoded* or *multipart/form-data* for passing parameters in Bot API requests.
-On successful call, a JSON-object containing the result will be returned.
+On a successful call, a JSON object containing the result will be returned.
 
 - [getMe](/bots/api/methods/getme.md): A simple method for testing your bot's authentication token.
 - [logOut](/bots/api/methods/logout.md): log out from the cloud Bot API server before launching the bot locally.
@@ -191,13 +191,13 @@ Message text formatting is documented at [Formatting options](/bots/api/formatti
 
 #### Ephemeral Messages and Commands
 
-Ephemeral interactions allow a bot and an individual member of a group or supergroup chat to communicate privately on the public timeline without cluttering the chat for other members. They may disappear automatically after some time, or if the app is restarted.
+Ephemeral interactions allow a bot and an individual member of a chat to communicate privately on the public timeline without cluttering the chat for other members. They may disappear automatically after some time, or if the app is restarted.
 
 **Ephemeral Commands (User to Bot)**
 Bots can declare ephemeral commands by setting the *is_ephemeral* field to *True* in the [BotCommand](/bots/api/types/botcommand.md) class. A user can then send an ephemeral command that is received by the target bot but remains invisible to all members of the chat, including both users and other bots.
 
 **Ephemeral Messages**
-Bots can send an ephemeral message response back to a specific user designated by the *receiver_user_id* parameter. Other members of the group or supergroup chat will not see the message.
+Bots can send an ephemeral message response back to a specific user designated by the field *receiver_user_id* in the parameter *ephemeral_message_parameters*. Other members of the chat will not see the message. If *callback_query_id* is specified and *receiver_user_id* is omitted, then the message is sent as an ephemeral reply to the callback query and is shown only to the user who pressed the button. Such replies can be sent in any chat except channel direct messages chats.
 
 > It is **not guaranteed** that the ephemeral message will be received, especially if the user is offline.
 
@@ -205,10 +205,10 @@ Bots can send an ephemeral message response back to a specific user designated b
 
 * Any bot can send an ephemeral message to a user within **15 seconds** of the incoming eligible action. The message will be sent to the exact client application that triggered the action. For this the bot must provide either:
 
-  * The *callback_query_id* from a received callback query, or
+  * The *ephemeral_message_parameters.callback_query_id* from a received callback query, or
   * The *reply_parameters.ephemeral_message_id* from an incoming ephemeral message.
 
-* If the bot is a chat administrator, it can send an ephemeral message to any non-bot member of the chat at any time without needing to specify a *callback_query_id* or *reply_parameters.ephemeral_message_id*. In this case, the message may be delivered across multiple active client applications of the user, but is regardless not guaranteed to be delivered to any of them.
+* If the bot is a chat administrator, it can send an ephemeral message to any non-bot member of the chat at any time without needing to specify *ephemeral_message_parameters.callback_query_id* or *reply_parameters.ephemeral_message_id*. In this case, the message may be delivered across multiple active client applications of the user, but is regardless not guaranteed to be delivered to any of them.
 
 #### Paid Broadcasts
 
@@ -226,15 +226,15 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [sendLivePhoto](/bots/api/methods/sendlivephoto.md): send live photos.
 - [sendAudio](/bots/api/methods/sendaudio.md): send audio files, if you want Telegram clients to display them in the music player.
 - [sendDocument](/bots/api/methods/senddocument.md): send general files.
-- [sendVideo](/bots/api/methods/sendvideo.md): send video files, Telegram clients support MPEG4 videos (other formats may be sent as Document).
+- [sendVideo](/bots/api/methods/sendvideo.md): send video files; Telegram clients support MPEG4 videos (other formats may be sent as Document).
 - [sendAnimation](/bots/api/methods/sendanimation.md): send animation files (GIF or H.264/MPEG-4 AVC video without sound).
 - [sendVoice](/bots/api/methods/sendvoice.md): send audio files, if you want Telegram clients to display the file as a playable voice message.
-- [sendVideoNote](/bots/api/methods/sendvideonote.md): send a rounded square MPEG4 video of up to 1 minute long.
+- [sendVideoNote](/bots/api/methods/sendvideonote.md): send a rounded square MPEG4 video up to 1 minute long.
 - [sendWidget](/bots/api/methods/sendwidget.md): send a message with an HTML widget.
-- [sendSharedWidget](/bots/api/methods/sendsharedwidget.md): send again a shared widget created by the bot.
+- [sendSharedWidget](/bots/api/methods/sendsharedwidget.md): resend a shared widget created by the bot.
 - [sendPaidMedia](/bots/api/methods/sendpaidmedia.md): send paid media.
 - [sendMediaGroup](/bots/api/methods/sendmediagroup.md): send a group of photos, live photos, videos, documents or audios as an album.
-- [sendLocation](/bots/api/methods/sendlocation.md): send point on the map.
+- [sendLocation](/bots/api/methods/sendlocation.md): send a point on the map.
 - [sendVenue](/bots/api/methods/sendvenue.md): send information about a venue.
 - [sendContact](/bots/api/methods/sendcontact.md): send phone contacts.
 - [sendPoll](/bots/api/methods/sendpoll.md): send a native poll.
@@ -284,7 +284,7 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [deleteChatStickerSet](/bots/api/methods/deletechatstickerset.md): delete a group sticker set from a supergroup.
 - [getForumTopicIconStickers](/bots/api/methods/getforumtopiciconstickers.md): get custom emoji stickers, which can be used as a forum topic icon by any user.
 - [createForumTopic](/bots/api/methods/createforumtopic.md): create a topic in a forum supergroup chat or a private chat with a user.
-- [editForumTopic](/bots/api/methods/editforumtopic.md): edit name and icon of a topic in a forum supergroup chat or a private chat with a user.
+- [editForumTopic](/bots/api/methods/editforumtopic.md): edit the name and icon of a topic in a forum supergroup chat or a private chat with a user.
 - [closeForumTopic](/bots/api/methods/closeforumtopic.md): close an open topic in a forum supergroup chat.
 - [reopenForumTopic](/bots/api/methods/reopenforumtopic.md): reopen a closed topic in a forum supergroup chat.
 - [deleteForumTopic](/bots/api/methods/deleteforumtopic.md): delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user.
@@ -304,7 +304,7 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [replaceManagedBotToken](/bots/api/methods/replacemanagedbottoken.md): revoke the current token of a managed bot and generate a new one.
 - [getManagedBotAccessSettings](/bots/api/methods/getmanagedbotaccesssettings.md): get the access settings of a managed bot.
 - [setManagedBotAccessSettings](/bots/api/methods/setmanagedbotaccesssettings.md): change the access settings of a managed bot.
-- [setMySettings](/bots/api/methods/setmysettings.md): change settings of the bot.
+- [setMySettings](/bots/api/methods/setmysettings.md): change the settings of the bot.
 - [setMyCommands](/bots/api/methods/setmycommands.md): change the list of the bot's commands.
 - [deleteMyCommands](/bots/api/methods/deletemycommands.md): delete the list of the bot's commands for the given scope and user language.
 - [getMyCommands](/bots/api/methods/getmycommands.md): get the current list of the bot's commands for the given scope and user language.
@@ -327,8 +327,8 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [verifyChat](/bots/api/methods/verifychat.md): Verifies a chat on behalf of the organization which is represented by the bot.
 - [removeUserVerification](/bots/api/methods/removeuserverification.md): Removes verification from a user who is currently verified on behalf of the organization represented by the bot.
 - [removeChatVerification](/bots/api/methods/removechatverification.md): Removes verification from a chat that is currently verified on behalf of the organization represented by the bot.
-- [readBusinessMessage](/bots/api/methods/readbusinessmessage.md): Marks incoming message as read on behalf of a business account.
-- [deleteBusinessMessages](/bots/api/methods/deletebusinessmessages.md): Delete messages on behalf of a business account.
+- [readBusinessMessage](/bots/api/methods/readbusinessmessage.md): Marks an incoming message as read on behalf of a business account.
+- [deleteBusinessMessages](/bots/api/methods/deletebusinessmessages.md): Deletes messages on behalf of a business account.
 - [setBusinessAccountName](/bots/api/methods/setbusinessaccountname.md): Changes the first and last name of a managed business account.
 - [setBusinessAccountUsername](/bots/api/methods/setbusinessaccountusername.md): Changes the username of a managed business account.
 - [setBusinessAccountBio](/bots/api/methods/setbusinessaccountbio.md): Changes the bio of a managed business account.
@@ -361,11 +361,11 @@ Methods and objects used in the inline mode are described in the [Inline mode se
 
 The following methods allow you to change an existing message in the message history instead of sending a new one with a result of an action. This is most useful for messages with [inline keyboards](/bots/features.md#inline-keyboards) using callback queries, but can also help reduce clutter in conversations with regular chat bots.
 
-Please note, that it is currently only possible to edit messages without *reply_markup* or with [inline keyboards](/bots/features.md#inline-keyboards).
+Please note that it is currently only possible to edit messages without *reply_markup* or with [inline keyboards](/bots/features.md#inline-keyboards).
 
 - [editMessageText](/bots/api/methods/editmessagetext.md): edit text, rich and game messages.
 - [editMessageCaption](/bots/api/methods/editmessagecaption.md): edit captions of messages.
-- [editMessageMedia](/bots/api/methods/editmessagemedia.md): edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with a media.
+- [editMessageMedia](/bots/api/methods/editmessagemedia.md): edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with media.
 - [editMessageLiveLocation](/bots/api/methods/editmessagelivelocation.md): edit live location messages.
 - [stopMessageLiveLocation](/bots/api/methods/stopmessagelivelocation.md): stop updating a live location message before *live_period* expires.
 - [editMessageChecklist](/bots/api/methods/editmessagechecklist.md): edit a checklist on behalf of a connected business account.
@@ -444,7 +444,7 @@ Types of this section are listed at [Bot API types](/bots/api/types.md#payments)
 
 Types of this section are listed at [Bot API types](/bots/api/types.md#telegram-passport).
 
-- [setPassportDataErrors](/bots/api/methods/setpassportdataerrors.md): Informs a user that some of the Telegram Passport elements they provided contains errors.
+- [setPassportDataErrors](/bots/api/methods/setpassportdataerrors.md): Informs a user that some of the Telegram Passport elements they provided contain errors.
 
 ### Games
 
@@ -455,7 +455,7 @@ Your bot can offer users **HTML5 games** to play solo or to compete against each
 * If you send the game message without any buttons, it will automatically have a 'Play *GameName*' button. When this button is pressed, your bot gets a [CallbackQuery](/bots/api/types/callbackquery.md) with the *game_short_name* of the requested game. You provide the correct URL for this particular user and the app opens the game in the in-app browser.
 * You can manually add multiple buttons to your game message. Please note that the first button in the first row **must always** launch the game, using the field *callback_game* in [InlineKeyboardButton](/bots/api/types/inlinekeyboardbutton.md). You can add extra buttons according to taste: e.g., for a description of the rules, or to open the game's official community.
 * To make your game more attractive, you can upload a GIF animation that demonstrates the game to the users via [BotFather](https://t.me/botfather) (see [Lumberjack](https://t.me/gamebot?game=lumberjack) for example).
-* A game message will also display high scores for the current chat. Use [setGameScore](/bots/api/methods/setgamescore.md) to post high scores to the chat with the game, add the *disable_edit_message* parameter to disable automatic update of the message with the current scoreboard.
+* A game message will also display high scores for the current chat. Use [setGameScore](/bots/api/methods/setgamescore.md) to post high scores to the chat with the game; add the *disable_edit_message* parameter to disable automatic update of the message with the current scoreboard.
 * Use [getGameHighScores](/bots/api/methods/getgamehighscores.md) to get data for in-game high score tables.
 * You can also add an extra [sharing button](/bots/games.md#sharing-your-game-to-telegram-chats) for users to share their best score to different chats.
 * For examples of what can be done using this new stuff, check the [@gamebot](https://t.me/gamebot) and [@gamee](https://t.me/gamee) bots.

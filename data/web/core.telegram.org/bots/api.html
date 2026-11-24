@@ -254,7 +254,7 @@ To learn how to create…">
 <tr>
 <td>update_id</td>
 <td>Integer</td>
-<td>The update&#39;s unique identifier. Update identifiers start from a certain positive number and increase sequentially. This identifier becomes especially handy if you&#39;re using <a href="#setwebhook">webhooks</a>, since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order. If there are no new updates for at least a week, then identifier of the next update will be chosen randomly instead of sequentially.</td>
+<td>The update&#39;s unique identifier. Update identifiers start from a certain positive number and increase sequentially. This identifier becomes especially handy if you&#39;re using <a href="#setwebhook">webhooks</a>, since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order. If there are no new updates for at least a week, then the identifier of the next update will be chosen randomly instead of sequentially.</td>
 </tr>
 <tr>
 <td>message</td>
@@ -309,7 +309,7 @@ To learn how to create…">
 <tr>
 <td>message_reaction_count</td>
 <td><a href="#messagereactioncountupdated">MessageReactionCountUpdated</a></td>
-<td><em>Optional</em>. Reactions to a message with anonymous reactions were changed. The bot must be an administrator in the chat and must explicitly specify <code>&quot;message_reaction_count&quot;</code> in the list of <em>allowed_updates</em> to receive these updates. The updates are grouped and can be sent with delay up to a few minutes.</td>
+<td><em>Optional</em>. Reactions to a message with anonymous reactions were changed. The bot must be an administrator in the chat and must explicitly specify <code>&quot;message_reaction_count&quot;</code> in the list of <em>allowed_updates</em> to receive these updates. The updates are grouped and can be sent with a delay of up to a few minutes.</td>
 </tr>
 <tr>
 <td>inline_query</td>
@@ -354,7 +354,7 @@ To learn how to create…">
 <tr>
 <td>poll</td>
 <td><a href="#poll">Poll</a></td>
-<td><em>Optional</em>. New poll state. Bots receive only updates about manually stopped polls and polls, which are sent by the bot.</td>
+<td><em>Optional</em>. New poll state. Bots receive only updates about manually stopped polls and polls which are sent by the bot.</td>
 </tr>
 <tr>
 <td>poll_answer</td>
@@ -389,7 +389,7 @@ To learn how to create…">
 <tr>
 <td>managed_bot</td>
 <td><a href="#managedbotupdated">ManagedBotUpdated</a></td>
-<td><em>Optional</em>. A new bot was created to be managed by the bot, or token or owner of a managed bot was changed</td>
+<td><em>Optional</em>. A new bot was created to be managed by the bot, or the token or owner of a managed bot was changed</td>
 </tr>
 <tr>
 <td>subscription</td>
@@ -431,7 +431,7 @@ To learn how to create…">
 <td>timeout</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive, short polling should be used for testing purposes only.</td>
+<td>Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive; short polling should be used for testing purposes only.</td>
 </tr>
 <tr>
 <td>allowed_updates</td>
@@ -445,7 +445,7 @@ To learn how to create…">
 <p><strong>Notes</strong><br><strong>1.</strong> This method will not work if an outgoing webhook is set up.<br><strong>2.</strong> In order to avoid getting duplicate updates, recalculate <em>offset</em> after each server response.</p>
 </blockquote>
 <h4><a class="anchor" name="setwebhook" href="#setwebhook"><i class="anchor-icon"></i></a>setWebhook</h4>
-<p>Use this method to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized <a href="#update">Update</a>. In case of an unsuccessful request (a request with response <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status code</a> different from <code>2XY</code>), we will repeat the request and give up after a reasonable amount of attempts. Returns <em>True</em> on success.</p>
+<p>Use this method to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized <a href="#update">Update</a>. In case of an unsuccessful request (a request with response <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status code</a> different from <code>2XY</code>), we will repeat the request and give up after a reasonable number of attempts. Returns <em>True</em> on success.</p>
 <p>If you&#39;d like to make sure that the webhook was set by you, you can specify secret data in the parameter <em>secret_token</em>. If specified, the request will contain a header “X-Telegram-Bot-Api-Secret-Token” with the secret token as content.</p>
 <table class="table">
 <thead>
@@ -485,7 +485,7 @@ To learn how to create…">
 <td>allowed_updates</td>
 <td>Array of String</td>
 <td>Optional</td>
-<td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>[&quot;message&quot;, &quot;edited_channel_post&quot;, &quot;callback_query&quot;]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em>, <em>message_reaction</em>, and <em>message_reaction_count</em> (default). If not specified, the previous setting will be used.<br>Please note that this parameter doesn&#39;t affect updates created before the call to the setWebhook, so unwanted updates may be received for a short period of time.</td>
+<td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>[&quot;message&quot;, &quot;edited_channel_post&quot;, &quot;callback_query&quot;]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em>, <em>message_reaction</em>, and <em>message_reaction_count</em> (default). If not specified, the previous setting will be used.<br>Please note that this parameter doesn&#39;t affect updates created before the call to setWebhook, so unwanted updates may be received for a short period of time.</td>
 </tr>
 <tr>
 <td>drop_pending_updates</td>
@@ -502,7 +502,7 @@ To learn how to create…">
 </tbody>
 </table>
 <blockquote>
-<p><strong>Notes</strong><br><strong>1.</strong> You will not be able to receive updates using <a href="#getupdates">getUpdates</a> for as long as an outgoing webhook is set up.<br><strong>2.</strong> To use a self-signed certificate, you need to upload your <a href="/bots/self-signed">public key certificate</a> using <em>certificate</em> parameter. Please upload as InputFile, sending a String will not work.<br><strong>3.</strong> Ports currently supported <em>for webhooks</em>: <strong>443, 80, 88, 8443</strong>.</p>
+<p><strong>Notes</strong><br><strong>1.</strong> You will not be able to receive updates using <a href="#getupdates">getUpdates</a> for as long as an outgoing webhook is set up.<br><strong>2.</strong> To use a self-signed certificate, you need to upload your <a href="/bots/self-signed">public key certificate</a> using the <em>certificate</em> parameter. Please upload it as InputFile; sending a String will not work.<br><strong>3.</strong> Ports currently supported <em>for webhooks</em>: <strong>443, 80, 88, 8443</strong>.</p>
 <p>If you&#39;re having any trouble setting up webhooks, please check out this <a href="/bots/webhooks">amazing guide to webhooks</a>.</p>
 </blockquote>
 <h4><a class="anchor" name="deletewebhook" href="#deletewebhook"><i class="anchor-icon"></i></a>deleteWebhook</h4>
@@ -526,7 +526,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="getwebhookinfo" href="#getwebhookinfo"><i class="anchor-icon"></i></a>getWebhookInfo</h4>
-<p>Use this method to get current webhook status. Requires no parameters. On success, returns a <a href="#webhookinfo">WebhookInfo</a> object. If the bot is using <a href="#getupdates">getUpdates</a>, will return an object with the <em>url</em> field empty.</p>
+<p>Use this method to get the current webhook status. Requires no parameters. On success, returns a <a href="#webhookinfo">WebhookInfo</a> object. If the bot is using <a href="#getupdates">getUpdates</a>, it will return an object with the <em>url</em> field empty.</p>
 <h4><a class="anchor" name="webhookinfo" href="#webhookinfo"><i class="anchor-icon"></i></a>WebhookInfo</h4>
 <p>Describes the current status of a webhook.</p>
 <table class="table">
@@ -586,10 +586,10 @@ To learn how to create…">
 </tbody>
 </table>
 <h3><a class="anchor" name="available-types" href="#available-types"><i class="anchor-icon"></i></a>Available types</h3>
-<p>All types used in the Bot API responses are represented as JSON-objects.</p>
+<p>All types used in the Bot API responses are represented as JSON objects.</p>
 <p>It is safe to use 32-bit signed integers for storing all <strong>Integer</strong> fields unless otherwise noted.</p>
 <blockquote>
-<p><strong>Optional</strong> fields may be not returned when irrelevant.</p>
+<p><strong>Optional</strong> fields may not be returned when irrelevant.</p>
 </blockquote>
 <h4><a class="anchor" name="botfullinfo" href="#botfullinfo"><i class="anchor-icon"></i></a>BotFullInfo</h4>
 <p>This object contains full information about the bot itself.</p>
@@ -605,7 +605,7 @@ To learn how to create…">
 <tr>
 <td>id</td>
 <td>Integer</td>
-<td>Unique identifier for this bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Unique identifier for this bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>is_bot</td>
@@ -708,7 +708,7 @@ To learn how to create…">
 <tr>
 <td>id</td>
 <td>Integer</td>
-<td>Unique identifier for this user or bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Unique identifier for this user or bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>is_bot</td>
@@ -761,7 +761,7 @@ To learn how to create…">
 <tr>
 <td>id</td>
 <td>Integer</td>
-<td>Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>type</td>
@@ -814,7 +814,7 @@ To learn how to create…">
 <tr>
 <td>id</td>
 <td>Integer</td>
-<td>Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>type</td>
@@ -939,7 +939,7 @@ To learn how to create…">
 <tr>
 <td>has_private_forwards</td>
 <td>True</td>
-<td><em>Optional</em>. <em>True</em>, if privacy settings of the other party in the private chat allows to use <code>tg://user?id=&lt;user_id&gt;</code> links only in chats with the user</td>
+<td><em>Optional</em>. <em>True</em>, if the privacy settings of the other party in the private chat allow using <code>tg://user?id=&lt;user_id&gt;</code> links only in chats with the user</td>
 </tr>
 <tr>
 <td>has_restricted_voice_and_video_messages</td>
@@ -1039,7 +1039,7 @@ To learn how to create…">
 <tr>
 <td>linked_chat_id</td>
 <td>Integer</td>
-<td><em>Optional</em>. Unique identifier for the linked chat, i.e. the discussion group identifier for a channel and vice versa; for supergroups and channel chats. This identifier may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier.</td>
+<td><em>Optional</em>. Unique identifier for the linked chat, i.e. the discussion group identifier for a channel and vice versa; for supergroups and channel chats. This identifier may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>location</td>
@@ -1437,7 +1437,7 @@ To learn how to create…">
 <tr>
 <td>new_chat_photo</td>
 <td>Array of <a href="#photosize">PhotoSize</a></td>
-<td><em>Optional</em>. A chat photo was change to this value</td>
+<td><em>Optional</em>. A chat photo was changed to this value</td>
 </tr>
 <tr>
 <td>delete_chat_photo</td>
@@ -1452,12 +1452,12 @@ To learn how to create…">
 <tr>
 <td>supergroup_chat_created</td>
 <td>True</td>
-<td><em>Optional</em>. Service message: the supergroup has been created. This field can&#39;t be received in a message coming through updates, because bot can&#39;t be a member of a supergroup when it is created. It can only be found in reply_to_message if someone replies to a very first message in a directly created supergroup.</td>
+<td><em>Optional</em>. Service message: the supergroup has been created. This field can&#39;t be received in a message coming through updates, because a bot can&#39;t be a member of a supergroup when it is created. It can only be found in reply_to_message if someone replies to the very first message in a directly created supergroup.</td>
 </tr>
 <tr>
 <td>channel_chat_created</td>
 <td>True</td>
-<td><em>Optional</em>. Service message: the channel has been created. This field can&#39;t be received in a message coming through updates, because bot can&#39;t be a member of a channel when it is created. It can only be found in reply_to_message if someone replies to a very first message in a channel.</td>
+<td><em>Optional</em>. Service message: the channel has been created. This field can&#39;t be received in a message coming through updates, because a bot can&#39;t be a member of a channel when it is created. It can only be found in reply_to_message if someone replies to the very first message in a channel.</td>
 </tr>
 <tr>
 <td>message_auto_delete_timer_changed</td>
@@ -1467,12 +1467,12 @@ To learn how to create…">
 <tr>
 <td>migrate_to_chat_id</td>
 <td>Integer</td>
-<td><em>Optional</em>. The group has been migrated to a supergroup with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td><em>Optional</em>. The group has been migrated to a supergroup with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>migrate_from_chat_id</td>
 <td>Integer</td>
-<td><em>Optional</em>. The supergroup has been migrated from a group with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td><em>Optional</em>. The supergroup has been migrated from a group with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>pinned_message</td>
@@ -1730,7 +1730,7 @@ To learn how to create…">
 <tr>
 <td>message_id</td>
 <td>Integer</td>
-<td>Unique message identifier. In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.</td>
+<td>Unique message identifier. In specific instances (e.g., a message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.</td>
 </tr>
 </tbody>
 </table>
@@ -1797,7 +1797,7 @@ To learn how to create…">
 <tr>
 <td>url</td>
 <td>String</td>
-<td><em>Optional</em>. For “text_link” only, URL that will be opened after user taps on the text</td>
+<td><em>Optional</em>. For “text_link” only, URL that will be opened after the user taps on the text</td>
 </tr>
 <tr>
 <td>user</td>
@@ -2061,7 +2061,7 @@ To learn how to create…">
 <tr>
 <td>quote_rich_texts</td>
 <td>Array of <a href="#richtext">RichText</a></td>
-<td><em>Optional</em>. A JSON-serialized list of quoted parts of the <a href="#richmessage">rich message</a> to be replied to. Must contain one element for each quoted text of the message in the order of their appearance. Each of the following is a separate quoted text: the text of a paragraph, a heading, a preformatted block, a footer, or a mathematical expression; the text and the credit of a block quotation or a pull quotation; the summary of a details block; the caption and each cell of a table; the text and the credit of a caption of a media block, a collage, a slideshow, or a map. Texts of blocks nested in lists, block quotations, details, collages, and slideshows are separate quoted texts too. The first and the last elements can contain only a part of the corresponding text; all other elements must contain the whole text. Formatting of the quoted parts must be kept, and rich texts must be nested in the same way as in the message received from the server. Mathematical expressions must be quoted entirely. Buttons in <a href="#richblockbuttons">RichBlockButtons</a>, anchors and dividers can&#39;t be quoted. Up to 32 quoted texts with total length up to 1024 characters can be specified. Only plain text, <a href="#richtextbold">RichTextBold</a>, <a href="#richtextitalic">RichTextItalic</a>, <a href="#richtextunderline">RichTextUnderline</a>, <a href="#richtextstrikethrough">RichTextStrikethrough</a>, <a href="#richtextspoiler">RichTextSpoiler</a>, <a href="#richtextsubscript">RichTextSubscript</a>, <a href="#richtextsuperscript">RichTextSuperscript</a>, <a href="#richtextdatetime">RichTextDateTime</a>, <a href="#richtextcustomemoji">RichTextCustomEmoji</a>, <a href="#richtextmathematicalexpression">RichTextMathematicalExpression</a>, and arrays of them are kept in the quote; other rich text types are replaced with their text. If non-empty, then <em>quote</em>, <em>quote_parse_mode</em> and <em>quote_entities</em> are ignored.</td>
+<td><em>Optional</em>. A JSON-serialized list of quoted parts of the <a href="#richmessage">rich message</a> to be replied to. Must contain one element for each quoted text of the message in the order of their appearance. Each of the following is a separate quoted text: the text of a paragraph, a heading, a preformatted block, a footer, or a mathematical expression; the text and the credit of a block quotation or a pull quotation; the summary of a details block; the caption and each cell of a table; the text and the credit of a caption of a media block, a collage, a slideshow, or a map. Texts of blocks nested in lists, block quotations, details, collages, and slideshows are separate quoted texts too. The first and the last elements can contain only a part of the corresponding text; all other elements must contain the whole text. Formatting of the quoted parts must be kept, and rich texts must be nested in the same way as in the message received from the server. Mathematical expressions must be quoted entirely. Buttons in <a href="#richblockbuttons">RichBlockButtons</a>, anchors and dividers can&#39;t be quoted. Up to 32 quoted texts with a total length of up to 1024 characters can be specified. Only plain text, <a href="#richtextbold">RichTextBold</a>, <a href="#richtextitalic">RichTextItalic</a>, <a href="#richtextunderline">RichTextUnderline</a>, <a href="#richtextstrikethrough">RichTextStrikethrough</a>, <a href="#richtextspoiler">RichTextSpoiler</a>, <a href="#richtextsubscript">RichTextSubscript</a>, <a href="#richtextsuperscript">RichTextSuperscript</a>, <a href="#richtextdatetime">RichTextDateTime</a>, <a href="#richtextcustomemoji">RichTextCustomEmoji</a>, <a href="#richtextmathematicalexpression">RichTextMathematicalExpression</a>, and arrays of them are kept in the quote; other rich text types are replaced with their text. If non-empty, then <em>quote</em>, <em>quote_parse_mode</em> and <em>quote_entities</em> are ignored.</td>
 </tr>
 <tr>
 <td>quote_position</td>
@@ -2081,6 +2081,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="ephemeralmessageparameters" href="#ephemeralmessageparameters"><i class="anchor-icon"></i></a>EphemeralMessageParameters</h4>
+<p>Describes the parameters of an ephemeral message to be sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -2334,7 +2335,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 </tbody>
 </table>
@@ -2387,7 +2388,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 <tr>
 <td>thumbnail</td>
@@ -2435,7 +2436,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 </tbody>
 </table>
@@ -2458,12 +2459,12 @@ To learn how to create…">
 <tr>
 <td>file_id</td>
 <td>String</td>
-<td>Identifier for the video file which can be used to download or reuse the file</td>
+<td>Identifier for the video file, which can be used to download or reuse the file</td>
 </tr>
 <tr>
 <td>file_unique_id</td>
 <td>String</td>
-<td>Unique identifier for the video file which is supposed to be the same over time and for different bots. Can&#39;t be used to download or reuse the file.</td>
+<td>Unique identifier for the video file, which is supposed to be the same over time and for different bots. Can&#39;t be used to download or reuse the file.</td>
 </tr>
 <tr>
 <td>width</td>
@@ -2488,7 +2489,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 </tbody>
 </table>
@@ -2554,7 +2555,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 </tbody>
 </table>
@@ -2627,7 +2628,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 </tbody>
 </table>
@@ -2708,7 +2709,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 </tbody>
 </table>
@@ -2917,7 +2918,7 @@ To learn how to create…">
 <tr>
 <td>user_id</td>
 <td>Integer</td>
-<td><em>Optional</em>. Contact&#39;s user identifier in Telegram. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td><em>Optional</em>. Contact&#39;s user identifier in Telegram. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>vcard</td>
@@ -3237,12 +3238,12 @@ To learn how to create…">
 <tr>
 <td>allows_revoting</td>
 <td>Boolean</td>
-<td><em>True</em>, if the poll allows to change the chosen answer options</td>
+<td><em>True</em>, if the poll allows changing the chosen answer options</td>
 </tr>
 <tr>
 <td>members_only</td>
 <td>Boolean</td>
-<td><em>True</em> if voting is limited to users who have been members of the chat where the poll was originally sent for more than 24 hours</td>
+<td><em>True</em>, if voting is limited to users who have been members of the chat where the poll was originally sent for more than 24 hours</td>
 </tr>
 <tr>
 <td>country_codes</td>
@@ -3487,7 +3488,7 @@ To learn how to create…">
 <tr>
 <td>heading</td>
 <td>Integer</td>
-<td><em>Optional</em>. The direction in which user is moving, in degrees; 1-360. For active live locations only.</td>
+<td><em>Optional</em>. The direction in which the user is moving, in degrees; 1-360. For active live locations only.</td>
 </tr>
 <tr>
 <td>proximity_alert_radius</td>
@@ -3650,7 +3651,7 @@ To learn how to create…">
 <tr>
 <td>bot</td>
 <td><a href="#user">User</a></td>
-<td>Information about the bot. Token of the bot can be fetched using the method <a href="#getmanagedbottoken">getManagedBotToken</a>.</td>
+<td>Information about the bot. The token of the bot can be fetched using the method <a href="#getmanagedbottoken">getManagedBotToken</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -4188,9 +4189,9 @@ To learn how to create…">
 <h4><a class="anchor" name="forumtopicreopened" href="#forumtopicreopened"><i class="anchor-icon"></i></a>ForumTopicReopened</h4>
 <p>This object represents a service message about a forum topic reopened in the chat. Currently holds no information.</p>
 <h4><a class="anchor" name="generalforumtopichidden" href="#generalforumtopichidden"><i class="anchor-icon"></i></a>GeneralForumTopicHidden</h4>
-<p>This object represents a service message about General forum topic hidden in the chat. Currently holds no information.</p>
+<p>This object represents a service message about the General forum topic hidden in the chat. Currently holds no information.</p>
 <h4><a class="anchor" name="generalforumtopicunhidden" href="#generalforumtopicunhidden"><i class="anchor-icon"></i></a>GeneralForumTopicUnhidden</h4>
-<p>This object represents a service message about General forum topic unhidden in the chat. Currently holds no information.</p>
+<p>This object represents a service message about the General forum topic unhidden in the chat. Currently holds no information.</p>
 <h4><a class="anchor" name="shareduser" href="#shareduser"><i class="anchor-icon"></i></a>SharedUser</h4>
 <p>This object contains information about a user that was shared with the bot using a <a href="#keyboardbuttonrequestusers">KeyboardButtonRequestUsers</a> button.</p>
 <table class="table">
@@ -4271,7 +4272,7 @@ To learn how to create…">
 <tr>
 <td>chat_id</td>
 <td>Integer</td>
-<td>Identifier of the shared chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot may not have access to the chat and could be unable to use this identifier, unless the chat is already known to the bot by some other means.</td>
+<td>Identifier of the shared chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier. The bot may not have access to the chat and could be unable to use this identifier, unless the chat is already known to the bot by some other means.</td>
 </tr>
 <tr>
 <td>title</td>
@@ -4627,7 +4628,7 @@ To learn how to create…">
 <tr>
 <td>winner_count</td>
 <td>Integer</td>
-<td>The number of users which are supposed to be selected as winners of the giveaway</td>
+<td>The number of users who are supposed to be selected as winners of the giveaway</td>
 </tr>
 <tr>
 <td>only_new_members</td>
@@ -4642,7 +4643,7 @@ To learn how to create…">
 <tr>
 <td>prize_description</td>
 <td>String</td>
-<td><em>Optional</em>. Description of additional giveaway prize</td>
+<td><em>Optional</em>. Description of an additional giveaway prize</td>
 </tr>
 <tr>
 <td>country_codes</td>
@@ -4730,7 +4731,7 @@ To learn how to create…">
 <tr>
 <td>prize_description</td>
 <td>String</td>
-<td><em>Optional</em>. Description of additional giveaway prize</td>
+<td><em>Optional</em>. Description of an additional giveaway prize</td>
 </tr>
 </tbody>
 </table>
@@ -4875,7 +4876,7 @@ To learn how to create…">
 <tr>
 <td>send_date</td>
 <td>Integer</td>
-<td><em>Optional</em>. Proposed send date of the post. If specified, then the date must be between 300 second and 2678400 seconds (30 days) in the future. If the field is omitted, then the post can be published at any time within 30 days at the sole discretion of the user who approves it.</td>
+<td><em>Optional</em>. Proposed send date of the post. If specified, then the date must be between 300 seconds and 2678400 seconds (30 days) in the future. If the field is omitted, then the post can be published at any time within 30 days at the sole discretion of the user who approves it.</td>
 </tr>
 </tbody>
 </table>
@@ -4893,7 +4894,7 @@ To learn how to create…">
 <tr>
 <td>topic_id</td>
 <td>Integer</td>
-<td>Unique identifier of the topic. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Unique identifier of the topic. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>user</td>
@@ -4903,7 +4904,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="userprofilephotos" href="#userprofilephotos"><i class="anchor-icon"></i></a>UserProfilePhotos</h4>
-<p>This object represent a user&#39;s profile pictures.</p>
+<p>This object represents a user&#39;s profile pictures.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4975,7 +4976,7 @@ To learn how to create…">
 <tr>
 <td>file_size</td>
 <td>Integer</td>
-<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this value.</td>
 </tr>
 <tr>
 <td>file_path</td>
@@ -5041,7 +5042,7 @@ To learn how to create…">
 <tr>
 <td>selective</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply to a message in the same chat and forum topic, sender of the original message.<br><br><em>Example:</em> A user requests to change the bot&#39;s language, bot replies to the request with a keyboard to select the new language. Other users in the group don&#39;t see the keyboard.</td>
+<td><em>Optional</em>. Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply to a message in the same chat and forum topic, sender of the original message.<br><br><em>Example:</em> A user requests to change the bot&#39;s language, and the bot replies to the request with a keyboard to select the new language. Other users in the group don&#39;t see the keyboard.</td>
 </tr>
 <tr>
 <td>force_reply</td>
@@ -5162,7 +5163,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="keyboardbuttonrequestchat" href="#keyboardbuttonrequestchat"><i class="anchor-icon"></i></a>KeyboardButtonRequestChat</h4>
-<p>This object defines the criteria used to request a suitable chat. Information about the selected chat will be shared with the bot when the corresponding button is pressed. The bot will be granted requested rights in the chat if appropriate. <a href="/bots/features#chat-and-user-selection">More about requesting chats »</a>.</p>
+<p>This object defines the criteria used to request a suitable chat. Information about the selected chat will be shared with the bot when the corresponding button is pressed. The bot will be granted the requested rights in the chat if appropriate. <a href="/bots/features#chat-and-user-selection">More about requesting chats »</a>.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5258,7 +5259,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="keyboardbuttonpolltype" href="#keyboardbuttonpolltype"><i class="anchor-icon"></i></a>KeyboardButtonPollType</h4>
-<p>This object represents type of a poll, which is allowed to be created and sent when the corresponding button is pressed.</p>
+<p>This object represents the type of a poll, which is allowed to be created and sent when the corresponding button is pressed.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5289,12 +5290,12 @@ To learn how to create…">
 <tr>
 <td>remove_keyboard</td>
 <td>True</td>
-<td>Requests clients to remove the custom keyboard (user will not be able to summon this keyboard; if you want to hide the keyboard from sight but keep it accessible, use <em>one_time_keyboard</em> in <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a>)</td>
+<td>Requests clients to remove the custom keyboard (the user will not be able to summon this keyboard; if you want to hide the keyboard from sight but keep it accessible, use <em>one_time_keyboard</em> in <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a>)</td>
 </tr>
 <tr>
 <td>selective</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Use this parameter if you want to remove the keyboard for specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply to a message in the same chat and forum topic, sender of the original message.<br><br><em>Example:</em> A user votes in a poll, bot returns confirmation message in reply to the vote and removes the keyboard for that user, while still showing the keyboard with poll options to users who haven&#39;t voted yet.</td>
+<td><em>Optional</em>. Use this parameter if you want to remove the keyboard for specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply to a message in the same chat and forum topic, sender of the original message.<br><br><em>Example:</em> A user votes in a poll, and the bot returns a confirmation message in reply to the vote and removes the keyboard for that user, while still showing the keyboard with poll options to users who haven&#39;t voted yet.</td>
 </tr>
 </tbody>
 </table>
@@ -5395,7 +5396,7 @@ To learn how to create…">
 <tr>
 <td>pay</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Specify <em>True</em>, to send a <a href="#payments">Pay button</a>. Substrings “<img class="emoji" src="//telegram.org/img/emoji/40/E2AD90.png" width="20" height="20" alt="⭐" />” and “XTR” in the buttons&#39;s text will be replaced with a Telegram Star icon.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row and can only be used in invoice messages.</td>
+<td><em>Optional</em>. Specify <em>True</em> to send a <a href="#payments">Pay button</a>. Substrings “<img class="emoji" src="//telegram.org/img/emoji/40/E2AD90.png" width="20" height="20" alt="⭐" />” and “XTR” in the button&#39;s text will be replaced with a Telegram Star icon.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row and can only be used in invoice messages.</td>
 </tr>
 <tr>
 <td>disabled</td>
@@ -5541,7 +5542,7 @@ To learn how to create…">
 <tr>
 <td>data</td>
 <td>String</td>
-<td><em>Optional</em>. Data associated with the callback button. Be aware that the message originated the query can contain no callback buttons with this data.</td>
+<td><em>Optional</em>. Data associated with the callback button. Be aware that the message that originated the query can contain no callback buttons with this data.</td>
 </tr>
 <tr>
 <td>game_short_name</td>
@@ -5774,7 +5775,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="forcereply" href="#forcereply"><i class="anchor-icon"></i></a>ForceReply</h4>
-<p>Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot&#39;s message and tapped &#39;Reply&#39;). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice <a href="/bots/features#privacy-mode">privacy mode</a>. Not supported in channels and for messages sent on behalf of a user account.</p>
+<p>Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot&#39;s message and tapped &#39;Reply&#39;). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice <a href="/bots/features#privacy-mode">privacy mode</a>. Not supported in channels and for messages sent on behalf of a business account.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5804,7 +5805,7 @@ To learn how to create…">
 <blockquote>
 <p><strong>Example:</strong> A <a href="https://t.me/PollBot">poll bot</a> for groups runs in privacy mode (only receives commands, replies to its messages and mentions). There could be two ways to create a new poll:</p>
 <ul>
-<li>Explain the user how to send a command with parameters (e.g. /newpoll question answer1 answer2). May be appealing for hardcore users but lacks modern day polish.</li>
+<li>Explain to the user how to send a command with parameters (e.g. /newpoll question answer1 answer2). May be appealing for hardcore users but lacks modern-day polish.</li>
 <li>Guide the user through a step-by-step process. &#39;Please send me your question&#39;, &#39;Cool, now let&#39;s add the first answer option&#39;, &#39;Great. Keep adding answer options, then send /done when you&#39;re ready&#39;.</li>
 </ul>
 <p>The last option is definitely more attractive. And if you use <a href="#forcereply">ForceReply</a> in your bot&#39;s questions, it will receive the user&#39;s answers even if it only receives replies, commands and mentions - without any extra work for the user.</p>
@@ -5823,7 +5824,7 @@ To learn how to create…">
 <tr>
 <td>id</td>
 <td>Integer</td>
-<td>Unique identifier for this community. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Unique identifier for this community. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>name</td>
@@ -5909,7 +5910,7 @@ To learn how to create…">
 <tr>
 <td>expire_date</td>
 <td>Integer</td>
-<td><em>Optional</em>. Point in time (Unix timestamp) when the link will expire or has been expired</td>
+<td><em>Optional</em>. Point in time (Unix timestamp) when the link will expire or has expired</td>
 </tr>
 <tr>
 <td>member_limit</td>
@@ -6481,7 +6482,7 @@ To learn how to create…">
 <tr>
 <td>user_chat_id</td>
 <td>Integer</td>
-<td>Identifier of a private chat with the user who sent the join request. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot can use this identifier for 5 minutes to send messages until the join request is processed, assuming no other administrator contacted the user.</td>
+<td>Identifier of a private chat with the user who sent the join request. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier. The bot can use this identifier for 5 minutes to send messages until the join request is processed, assuming no other administrator contacted the user.</td>
 </tr>
 <tr>
 <td>date</td>
@@ -6724,7 +6725,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="userrating" href="#userrating"><i class="anchor-icon"></i></a>UserRating</h4>
-<p>This object describes the rating of a user based on their Telegram Star spendings.</p>
+<p>This object describes the rating of a user based on their Telegram Star spending.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6737,7 +6738,7 @@ To learn how to create…">
 <tr>
 <td>level</td>
 <td>Integer</td>
-<td>Current level of the user, indicating their reliability when purchasing digital goods and services. A higher level suggests a more trustworthy customer; a negative level is likely reason for concern.</td>
+<td>Current level of the user, indicating their reliability when purchasing digital goods and services. A higher level suggests a more trustworthy customer; a negative level is likely a reason for concern.</td>
 </tr>
 <tr>
 <td>rating</td>
@@ -7185,7 +7186,7 @@ To learn how to create…">
 <tr>
 <td>is_flipped</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if reaction area corner is flipped</td>
+<td><em>Optional</em>. Pass <em>True</em> if the reaction area corner is flipped</td>
 </tr>
 </tbody>
 </table>
@@ -7231,7 +7232,7 @@ To learn how to create…">
 <tr>
 <td>temperature</td>
 <td>Float</td>
-<td>Temperature, in degree Celsius</td>
+<td>Temperature, in degrees Celsius</td>
 </tr>
 <tr>
 <td>emoji</td>
@@ -7634,7 +7635,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="gifts" href="#gifts"><i class="anchor-icon"></i></a>Gifts</h4>
-<p>This object represent a list of gifts.</p>
+<p>This object represents a list of gifts.</p>
 <table class="table">
 <thead>
 <tr>
@@ -7708,7 +7709,7 @@ To learn how to create…">
 <tr>
 <td>rarity_per_mille</td>
 <td>Integer</td>
-<td>The number of unique gifts that receive this model for every 1000 gifts upgraded</td>
+<td>The number of unique gifts that receive this symbol for every 1000 gifts upgraded</td>
 </tr>
 </tbody>
 </table>
@@ -7865,7 +7866,7 @@ To learn how to create…">
 <tr>
 <td>is_premium</td>
 <td>True</td>
-<td><em>Optional</em>. <em>True</em>, if the original regular gift was exclusively purchaseable by Telegram Premium subscribers</td>
+<td><em>Optional</em>. <em>True</em>, if the original regular gift was exclusively purchasable by Telegram Premium subscribers</td>
 </tr>
 <tr>
 <td>is_burned</td>
@@ -8665,7 +8666,7 @@ To learn how to create…">
 <tr>
 <td>user</td>
 <td><a href="#user">User</a></td>
-<td>User for which the gift code was created</td>
+<td>User for whom the gift code was created</td>
 </tr>
 </tbody>
 </table>
@@ -8957,7 +8958,7 @@ To learn how to create…">
 <tr>
 <td>user_chat_id</td>
 <td>Integer</td>
-<td>Identifier of a private chat with the user who created the business connection. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td>Identifier of a private chat with the user who created the business connection. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>date</td>
@@ -9095,7 +9096,7 @@ To learn how to create…">
 <tr>
 <td>migrate_to_chat_id</td>
 <td>Integer</td>
-<td><em>Optional</em>. The group has been migrated to a supergroup with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+<td><em>Optional</em>. The group has been migrated to a supergroup with the specified identifier. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type is safe for storing this identifier.</td>
 </tr>
 <tr>
 <td>retry_after</td>
@@ -9138,7 +9139,7 @@ To learn how to create…">
 <tr>
 <td>thumbnail</td>
 <td>String</td>
-<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>caption</td>
@@ -9206,7 +9207,7 @@ To learn how to create…">
 <tr>
 <td>thumbnail</td>
 <td>String</td>
-<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>caption</td>
@@ -9264,7 +9265,7 @@ To learn how to create…">
 <tr>
 <td>thumbnail</td>
 <td>String</td>
-<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>caption</td>
@@ -9555,7 +9556,7 @@ To learn how to create…">
 <tr>
 <td>thumbnail</td>
 <td>String</td>
-<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>cover</td>
@@ -9633,7 +9634,7 @@ To learn how to create…">
 <tr>
 <td>media</td>
 <td>String</td>
-<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass &quot;attach://&lt;file_attach_name&gt;&quot; to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>caption</td>
@@ -9741,7 +9742,7 @@ To learn how to create…">
 <tr>
 <td>thumbnail</td>
 <td>String</td>
-<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>cover</td>
@@ -9902,7 +9903,7 @@ To learn how to create…">
 <h4><a class="anchor" name="sending-files" href="#sending-files"><i class="anchor-icon"></i></a>Sending files</h4>
 <p>There are three ways to send files (photos, stickers, audio, media, etc.):</p>
 <ol>
-<li>If the file is already stored somewhere on the Telegram servers, you don&#39;t need to reupload it: each file object has a <strong>file_id</strong> field, simply pass this <strong>file_id</strong> as a parameter instead of uploading. There are <strong>no limits</strong> for files sent this way.</li>
+<li>If the file is already stored somewhere on the Telegram servers, you don&#39;t need to reupload it: each file object has a <strong>file_id</strong> field; simply pass this <strong>file_id</strong> as a parameter instead of uploading. There are <strong>no limits</strong> for files sent this way.</li>
 <li>Provide Telegram with an HTTP URL for the file to be sent. Telegram will download and send the file. 5 MB max size for photos and 20 MB max for other types of content.</li>
 <li>Post the file using multipart/form-data in the usual way that files are uploaded via the browser. 10 MB max size for photos, 50 MB for other files.</li>
 </ol>
@@ -9973,12 +9974,12 @@ To learn how to create…">
 <p>Objects and methods used in the inline mode are described in the <a href="#inline-mode">Inline mode section</a>.</p>
 <h3><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available methods</h3>
 <blockquote>
-<p>All methods in the Bot API are case-insensitive. We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. Use either <a href="https://en.wikipedia.org/wiki/Query_string">URL query string</a> or <em>application/json</em> or <em>application/x-www-form-urlencoded</em> or <em>multipart/form-data</em> for passing parameters in Bot API requests.<br>On successful call, a JSON-object containing the result will be returned.</p>
+<p>All methods in the Bot API are case-insensitive. We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. Use either <a href="https://en.wikipedia.org/wiki/Query_string">URL query string</a> or <em>application/json</em> or <em>application/x-www-form-urlencoded</em> or <em>multipart/form-data</em> for passing parameters in Bot API requests.<br>On a successful call, a JSON object containing the result will be returned.</p>
 </blockquote>
 <h4><a class="anchor" name="getme" href="#getme"><i class="anchor-icon"></i></a>getMe</h4>
-<p>A simple method for testing your bot&#39;s authentication token. Requires no parameters. Returns information about the bot in form of a <a href="#botfullinfo">BotFullInfo</a> object.</p>
+<p>A simple method for testing your bot&#39;s authentication token. Requires no parameters. Returns information about the bot in the form of a <a href="#botfullinfo">BotFullInfo</a> object.</p>
 <h4><a class="anchor" name="logout" href="#logout"><i class="anchor-icon"></i></a>logOut</h4>
-<p>Use this method to log out from the cloud Bot API server before launching the bot locally. You <strong>must</strong> log out the bot before running it locally, otherwise there is no guarantee that the bot will receive updates. After a successful call, you can immediately log in on a local server, but will not be able to log in back to the cloud Bot API server for 10 minutes. Returns <em>True</em> on success. Requires no parameters.</p>
+<p>Use this method to log out from the cloud Bot API server before launching the bot locally. You <strong>must</strong> log out the bot before running it locally; otherwise, there is no guarantee that the bot will receive updates. After a successful call, you can immediately log in on a local server, but will not be able to log back in to the cloud Bot API server for 10 minutes. Returns <em>True</em> on success. Requires no parameters.</p>
 <h4><a class="anchor" name="close" href="#close"><i class="anchor-icon"></i></a>close</h4>
 <p>Use this method to close the bot instance before moving it from one local server to another. You need to delete the webhook before calling this method to ensure that the bot isn&#39;t launched again after server restart. The method will return error 429 in the first 10 minutes after the bot is launched. Returns <em>True</em> on success. Requires no parameters.</p>
 <h4><a class="anchor" name="sendmessage" href="#sendmessage"><i class="anchor-icon"></i></a>sendMessage</h4>
@@ -10094,10 +10095,10 @@ To learn how to create…">
 <h4><a class="anchor" name="formatting-options" href="#formatting-options"><i class="anchor-icon"></i></a>Formatting options</h4>
 <p>The Bot API supports basic formatting for messages. You can use bold, italic, underlined, strikethrough, spoiler text, block quotations as well as inline links and pre-formatted code in your bots&#39; messages. Telegram clients will render them accordingly. You can specify text entities directly, or use markdown-style or HTML-style formatting.</p>
 <p>Note that Telegram clients will display an <strong>alert</strong> to the user before opening an inline link (&#39;Open this link?&#39; together with the full URL).</p>
-<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters, then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- <em>blockquote</em> and <em>expandable_blockquote</em> entities can&#39;t be nested.<br>- All other entities can&#39;t contain each other.</p>
+<p>Message entities can be nested, providing the following restrictions are met:<br>- If two entities have common characters, then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- <em>blockquote</em> and <em>expandable_blockquote</em> entities can&#39;t be nested.<br>- All other entities can&#39;t contain each other.</p>
 <p>Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by their identifier without using a username. Please note:</p>
 <ul>
-<li>These links will work <strong>only</strong> if they are used inside an inline link or in an inline keyboard button. For example, they will not work, when used in a message text.</li>
+<li>These links will work <strong>only</strong> if they are used inside an inline link or in an inline keyboard button. For example, they will not work when used in a message text.</li>
 <li>Unless the user is a member of the chat where they were mentioned, these mentions are only guaranteed to work if the user has contacted the bot in private in the past or has sent a callback query to the bot via an inline button and doesn&#39;t have Forwarded Messages privacy enabled for the bot.</li>
 </ul>
 <p>You can find the list of programming and markup languages for which syntax highlighting is supported at <a href="https://github.com/TelegramMessenger/libprisma#supported-languages">libprisma#supported-languages</a>.</p>
@@ -10189,7 +10190,7 @@ The last line of the block quotation&lt;/blockquote&gt;</code></pre>
 <li>All <code>&lt;</code>, <code>&gt;</code> and <code>&amp;</code> symbols that are not a part of a tag or an HTML entity must be replaced with the corresponding HTML entities (<code>&lt;</code> with <code>&amp;lt;</code>, <code>&gt;</code> with <code>&amp;gt;</code> and <code>&amp;</code> with <code>&amp;amp;</code>).</li>
 <li>All numerical HTML entities are supported.</li>
 <li>The API currently supports only the following named HTML entities: <code>&amp;lt;</code>, <code>&amp;gt;</code>, <code>&amp;amp;</code> and <code>&amp;quot;</code>.</li>
-<li>Use nested <code>pre</code> and <code>code</code> tags, to define programming language for <code>pre</code> entity.</li>
+<li>Use nested <code>pre</code> and <code>code</code> tags to define the programming language for a <code>pre</code> entity.</li>
 <li>Programming language can&#39;t be specified for standalone <code>code</code> tags.</li>
 <li>A valid emoji must be used as the content of the <code>tg-emoji</code> tag. The emoji will be shown instead of the custom emoji in places where a custom emoji cannot be displayed (e.g., system notifications) or if the message is forwarded by a non-premium user. It is recommended to use the emoji from the <strong>emoji</strong> field of the custom emoji <a href="#sticker">sticker</a>.</li>
 <li>Custom emoji entities can only be used by bots that purchased additional usernames on <a href="https://fragment.com">Fragment</a> or in the messages directly sent by the bot to private, group and supergroup chats if the owner of the bot has a Telegram Premium subscription.</li>
@@ -10210,15 +10211,15 @@ pre-formatted fixed-width code block written in the Python programming language
 ```</code></pre>
 <p>Please note:</p>
 <ul>
-<li>Entities must not be nested, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
-<li>There is no way to specify “underline”, “strikethrough”, “spoiler”, “blockquote”, “expandable_blockquote”, “custom_emoji”, and “date_time” entities, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
+<li>Entities must not be nested; use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
+<li>There is no way to specify “underline”, “strikethrough”, “spoiler”, “blockquote”, “expandable_blockquote”, “custom_emoji”, and “date_time” entities; use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
 <li>To escape characters &#39;_&#39;, &#39;*&#39;, &#39;`&#39;, &#39;[&#39; outside of an entity, prepend the character &#39;\&#39; before them.</li>
-<li>Escaping inside entities is not allowed, so entity must be closed first and reopened again: use <code>_snake_\__case_</code> for italic <code>snake_case</code> and <code>*2*\**2=4*</code> for bold <code>2*2=4</code>.</li>
+<li>Escaping inside entities is not allowed, so the entity must be closed first and reopened again: use <code>_snake_\__case_</code> for italic <code>snake_case</code> and <code>*2*\**2=4*</code> for bold <code>2*2=4</code>.</li>
 </ul>
 <h4><a class="anchor" name="ephemeral-messages-and-commands" href="#ephemeral-messages-and-commands"><i class="anchor-icon"></i></a>Ephemeral Messages and Commands</h4>
-<p>Ephemeral interactions allow a bot and an individual member of a group or supergroup chat to communicate privately on the public timeline without cluttering the chat for other members. They may disappear automatically after some time, or if the app is restarted.</p>
+<p>Ephemeral interactions allow a bot and an individual member of a chat to communicate privately on the public timeline without cluttering the chat for other members. They may disappear automatically after some time, or if the app is restarted.</p>
 <p><strong>Ephemeral Commands (User to Bot)</strong><br>Bots can declare ephemeral commands by setting the <em>is_ephemeral</em> field to <em>True</em> in the <a href="#botcommand">BotCommand</a> class. A user can then send an ephemeral command that is received by the target bot but remains invisible to all members of the chat, including both users and other bots.</p>
-<p><strong>Ephemeral Messages</strong><br>Bots can send an ephemeral message response back to a specific user designated by the <em>receiver_user_id</em> parameter. Other members of the group or supergroup chat will not see the message.</p>
+<p><strong>Ephemeral Messages</strong><br>Bots can send an ephemeral message response back to a specific user designated by the field <em>receiver_user_id</em> in the parameter <em>ephemeral_message_parameters</em>. Other members of the chat will not see the message. If <em>callback_query_id</em> is specified and <em>receiver_user_id</em> is omitted, then the message is sent as an ephemeral reply to the callback query and is shown only to the user who pressed the button. Such replies can be sent in any chat except channel direct messages chats.</p>
 <blockquote>
 <p>It is <strong>not guaranteed</strong> that the ephemeral message will be received, especially if the user is offline.</p>
 </blockquote>
@@ -10226,11 +10227,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <ul>
 <li><p>Any bot can send an ephemeral message to a user within <strong>15 seconds</strong> of the incoming eligible action. The message will be sent to the exact client application that triggered the action. For this the bot must provide either:</p>
 <ul>
-<li>The <em>callback_query_id</em> from a received callback query, or</li>
+<li>The <em>ephemeral_message_parameters.callback_query_id</em> from a received callback query, or</li>
 <li>The <em>reply_parameters.ephemeral_message_id</em> from an incoming ephemeral message.</li>
 </ul>
 </li>
-<li><p>If the bot is a chat administrator, it can send an ephemeral message to any non-bot member of the chat at any time without needing to specify a <em>callback_query_id</em> or <em>reply_parameters.ephemeral_message_id</em>. In this case, the message may be delivered across multiple active client applications of the user, but is regardless not guaranteed to be delivered to any of them.</p>
+<li><p>If the bot is a chat administrator, it can send an ephemeral message to any non-bot member of the chat at any time without needing to specify <em>ephemeral_message_parameters.callback_query_id</em> or <em>reply_parameters.ephemeral_message_id</em>. In this case, the message may be delivered across multiple active client applications of the user, but is regardless not guaranteed to be delivered to any of them.</p>
 </li>
 </ul>
 <h4><a class="anchor" name="paid-broadcasts" href="#paid-broadcasts"><i class="anchor-icon"></i></a>Paid Broadcasts</h4>
@@ -10721,19 +10722,19 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>photo</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Yes</td>
-<td>The static photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+<td>The static photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new photo using multipart/form-data. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
 </tr>
 <tr>
 <td>caption</td>
 <td>String</td>
 <td>Optional</td>
-<td>Video caption (may also be used when resending videos by <em>file_id</em>), 0-1024 characters after entities parsing</td>
+<td>Live photo caption (may also be used when resending live photos by <em>file_id</em>), 0-1024 characters after entities parsing</td>
 </tr>
 <tr>
 <td>parse_mode</td>
 <td>String</td>
 <td>Optional</td>
-<td>Mode for parsing entities in the video caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
+<td>Mode for parsing entities in the live photo caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
 </tr>
 <tr>
 <td>caption_entities</td>
@@ -10751,7 +10752,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>has_spoiler</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the video needs to be covered with a spoiler animation</td>
+<td>Pass <em>True</em> if the live photo needs to be covered with a spoiler animation</td>
 </tr>
 <tr>
 <td>disable_notification</td>
@@ -10798,7 +10799,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendaudio" href="#sendaudio"><i class="anchor-icon"></i></a>sendAudio</h4>
-<p>Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .MP3 or .M4A format. On success, the sent <a href="#message">Message</a> is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.</p>
+<p>Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .MP3 or .M4A format. On success, the sent <a href="#message">Message</a> is returned. Bots can currently send audio files of up to 50 MB in size; this limit may be changed in the future.</p>
 <p>For sending voice messages, use the <a href="#sendvoice">sendVoice</a> method instead.</p>
 <table class="table">
 <thead>
@@ -10886,7 +10887,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>thumbnail</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
-<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>disable_notification</td>
@@ -10933,7 +10934,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="senddocument" href="#senddocument"><i class="anchor-icon"></i></a>sendDocument</h4>
-<p>Use this method to send general files. On success, the sent <a href="#message">Message</a> is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.</p>
+<p>Use this method to send general files. On success, the sent <a href="#message">Message</a> is returned. Bots can currently send files of any type of up to 50 MB in size; this limit may be changed in the future.</p>
 <table class="table">
 <thead>
 <tr>
@@ -10984,7 +10985,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>thumbnail</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
-<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>caption</td>
@@ -11055,7 +11056,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendvideo" href="#sendvideo"><i class="anchor-icon"></i></a>sendVideo</h4>
-<p>Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as <a href="#document">Document</a>). On success, the sent <a href="#message">Message</a> is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.</p>
+<p>Use this method to send video files; Telegram clients support MPEG4 videos (other formats may be sent as <a href="#document">Document</a>). On success, the sent <a href="#message">Message</a> is returned. Bots can currently send video files of up to 50 MB in size; this limit may be changed in the future.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11124,7 +11125,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>thumbnail</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
-<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>cover</td>
@@ -11219,7 +11220,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendanimation" href="#sendanimation"><i class="anchor-icon"></i></a>sendAnimation</h4>
-<p>Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound). On success, the sent <a href="#message">Message</a> is returned. Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.</p>
+<p>Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound). On success, the sent <a href="#message">Message</a> is returned. Bots can currently send animation files of up to 50 MB in size; this limit may be changed in the future.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11288,13 +11289,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>thumbnail</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
-<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>caption</td>
 <td>String</td>
 <td>Optional</td>
-<td>Animation caption (may also be used when resending animation by <em>file_id</em>), 0-1024 characters after entities parsing</td>
+<td>Animation caption (may also be used when resending animations by <em>file_id</em>), 0-1024 characters after entities parsing</td>
 </tr>
 <tr>
 <td>parse_mode</td>
@@ -11365,7 +11366,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendvoice" href="#sendvoice"><i class="anchor-icon"></i></a>sendVoice</h4>
-<p>Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .OGG file encoded with OPUS, or in .MP3 format, or in .M4A format (other formats may be sent as <a href="#audio">Audio</a> or <a href="#document">Document</a>). On success, the sent <a href="#message">Message</a> is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.</p>
+<p>Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .OGG file encoded with OPUS, or in .MP3 format, or in .M4A format (other formats may be sent as <a href="#audio">Audio</a> or <a href="#document">Document</a>). On success, the sent <a href="#message">Message</a> is returned. Bots can currently send voice messages of up to 50 MB in size; this limit may be changed in the future.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11481,7 +11482,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendvideonote" href="#sendvideonote"><i class="anchor-icon"></i></a>sendVideoNote</h4>
-<p>Use this method to send a rounded square MPEG4 video of up to 1 minute long. On success, the sent <a href="#message">Message</a> is returned.</p>
+<p>Use this method to send a rounded square MPEG4 video up to 1 minute long. On success, the sent <a href="#message">Message</a> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11544,7 +11545,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>thumbnail</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
-<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+<td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can only be uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
 <td>disable_notification</td>
@@ -11719,7 +11720,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendsharedwidget" href="#sendsharedwidget"><i class="anchor-icon"></i></a>sendSharedWidget</h4>
-<p>Use this method to send again a shared widget created by the bot. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can&#39;t be forwarded. On success, the sent <a href="#message">Message</a> is returned.</p>
+<p>Use this method to resend a shared widget created by the bot. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can&#39;t be forwarded. On success, the sent <a href="#message">Message</a> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11868,7 +11869,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>payload</td>
 <td>String</td>
 <td>Optional</td>
-<td>Bot-defined paid media payload, 0-128 bytes. This will not be displayed to the user, use it for your internal processes.</td>
+<td>Bot-defined paid media payload, 0-128 bytes. This will not be displayed to the user; use it for your internal processes.</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -11933,7 +11934,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendmediagroup" href="#sendmediagroup"><i class="anchor-icon"></i></a>sendMediaGroup</h4>
-<p>Use this method to send a group of photos, live photos, videos, documents or audios as an album. Documents and audio files can be only grouped in an album with messages of the same type. On success, an Array of <a href="#message">Message</a> objects that were sent is returned.</p>
+<p>Use this method to send a group of photos, live photos, videos, documents or audios as an album. Documents and audio files can only be grouped in an album with messages of the same type. On success, an Array of <a href="#message">Message</a> objects that were sent is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -12007,7 +12008,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendlocation" href="#sendlocation"><i class="anchor-icon"></i></a>sendLocation</h4>
-<p>Use this method to send point on the map. On success, the sent <a href="#message">Message</a> is returned.</p>
+<p>Use this method to send a point on the map. On success, the sent <a href="#message">Message</a> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -12448,7 +12449,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allows_revoting</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the poll allows to change chosen answer options, defaults to <em>False</em> for quizzes and to <em>True</em> for regular polls</td>
+<td>Pass <em>True</em> if the poll allows changing the chosen answer options, defaults to <em>False</em> for quizzes and to <em>True</em> for regular polls</td>
 </tr>
 <tr>
 <td>shuffle_options</td>
@@ -13025,7 +13026,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>until_date</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>Date when the user will be unbanned; Unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever. Applied for supergroups and channels only.</td>
+<td>Date when the user will be unbanned; Unix time. If the user is banned for more than 366 days or less than 30 seconds from the current time, they are considered to be banned forever. Applied for supergroups and channels only.</td>
 </tr>
 <tr>
 <td>revoke_messages</td>
@@ -13107,7 +13108,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>until_date</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>Date when restrictions will be lifted for the user; Unix time. If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.</td>
+<td>Date when restrictions will be lifted for the user; Unix time. If the user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.</td>
 </tr>
 </tbody>
 </table>
@@ -13175,7 +13176,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>can_change_info</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the administrator can change chat title, photo and other settings</td>
+<td>Pass <em>True</em> if the administrator can change the chat title, photo and other settings</td>
 </tr>
 <tr>
 <td>can_invite_users</td>
@@ -13362,7 +13363,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setchatpermissions" href="#setchatpermissions"><i class="anchor-icon"></i></a>setChatPermissions</h4>
-<p>Use this method to set default chat permissions for all members. The bot must be an administrator in the group or a supergroup for this to work and must have the <em>can_restrict_members</em> administrator rights. Returns <em>True</em> on success.</p>
+<p>Use this method to set default chat permissions for all members. The bot must be an administrator in the group or a supergroup for this to work and must have the <em>can_restrict_members</em> administrator right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -13417,7 +13418,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <p>Note: Each administrator in a chat generates their own invite links. Bots can&#39;t use invite links generated by other administrators. If you want your bot to work with invite links, it will need to generate its own link using <a href="#exportchatinvitelink">exportChatInviteLink</a> or by calling the <a href="#getchat">getChat</a> method. If your bot needs to generate a new primary invite link replacing its previous one, use <a href="#exportchatinvitelink">exportChatInviteLink</a> again.</p>
 </blockquote>
 <h4><a class="anchor" name="createchatinvitelink" href="#createchatinvitelink"><i class="anchor-icon"></i></a>createChatInviteLink</h4>
-<p>Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. The link can be revoked using the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>. Returns the new invite link as <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. The link can be revoked using the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>. Returns the new invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -13511,7 +13512,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="createchatsubscriptioninvitelink" href="#createchatsubscriptioninvitelink"><i class="anchor-icon"></i></a>createChatSubscriptionInviteLink</h4>
-<p>Use this method to create a <a href="https://telegram.org/blog/superchannels-star-reactions-subscriptions#star-subscriptions">subscription invite link</a> for a channel chat. The bot must have the <em>can_invite_users</em> administrator rights. The link can be edited using the method <a href="#editchatsubscriptioninvitelink">editChatSubscriptionInviteLink</a> or revoked using the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>. Returns the new invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to create a <a href="https://telegram.org/blog/superchannels-star-reactions-subscriptions#star-subscriptions">subscription invite link</a> for a channel chat. The bot must have the <em>can_invite_users</em> administrator right. The link can be edited using the method <a href="#editchatsubscriptioninvitelink">editChatSubscriptionInviteLink</a> or revoked using the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>. Returns the new invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -13549,7 +13550,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editchatsubscriptioninvitelink" href="#editchatsubscriptioninvitelink"><i class="anchor-icon"></i></a>editChatSubscriptionInviteLink</h4>
-<p>Use this method to edit a subscription invite link created by the bot. The bot must have the <em>can_invite_users</em> administrator rights. Returns the edited invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to edit a subscription invite link created by the bot. The bot must have the <em>can_invite_users</em> administrator right. Returns the edited invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -13581,7 +13582,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="revokechatinvitelink" href="#revokechatinvitelink"><i class="anchor-icon"></i></a>revokeChatInviteLink</h4>
-<p>Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the revoked invite link as <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the revoked invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14125,7 +14126,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editforumtopic" href="#editforumtopic"><i class="anchor-icon"></i></a>editForumTopic</h4>
-<p>Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
+<p>Use this method to edit the name and icon of a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14163,7 +14164,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="closeforumtopic" href="#closeforumtopic"><i class="anchor-icon"></i></a>closeForumTopic</h4>
-<p>Use this method to close an open topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
+<p>Use this method to close an open topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14189,7 +14190,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="reopenforumtopic" href="#reopenforumtopic"><i class="anchor-icon"></i></a>reopenForumTopic</h4>
-<p>Use this method to reopen a closed topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
+<p>Use this method to reopen a closed topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14215,7 +14216,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="deleteforumtopic" href="#deleteforumtopic"><i class="anchor-icon"></i></a>deleteForumTopic</h4>
-<p>Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>can_delete_messages</em> administrator rights. Returns <em>True</em> on success.</p>
+<p>Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the <em>can_delete_messages</em> administrator right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14267,7 +14268,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editgeneralforumtopic" href="#editgeneralforumtopic"><i class="anchor-icon"></i></a>editGeneralForumTopic</h4>
-<p>Use this method to edit the name of the &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. Returns <em>True</em> on success.</p>
+<p>Use this method to edit the name of the &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14293,7 +14294,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="closegeneralforumtopic" href="#closegeneralforumtopic"><i class="anchor-icon"></i></a>closeGeneralForumTopic</h4>
-<p>Use this method to close an open &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. Returns <em>True</em> on success.</p>
+<p>Use this method to close an open &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14313,7 +14314,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="reopengeneralforumtopic" href="#reopengeneralforumtopic"><i class="anchor-icon"></i></a>reopenGeneralForumTopic</h4>
-<p>Use this method to reopen a closed &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. The topic will be automatically unhidden if it was hidden. Returns <em>True</em> on success.</p>
+<p>Use this method to reopen a closed &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right. The topic will be automatically unhidden if it was hidden. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14333,7 +14334,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="hidegeneralforumtopic" href="#hidegeneralforumtopic"><i class="anchor-icon"></i></a>hideGeneralForumTopic</h4>
-<p>Use this method to hide the &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. The topic will be automatically closed if it was open. Returns <em>True</em> on success.</p>
+<p>Use this method to hide the &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right. The topic will be automatically closed if it was open. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14353,7 +14354,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="unhidegeneralforumtopic" href="#unhidegeneralforumtopic"><i class="anchor-icon"></i></a>unhideGeneralForumTopic</h4>
-<p>Use this method to unhide the &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. Returns <em>True</em> on success.</p>
+<p>Use this method to unhide the &#39;General&#39; topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -14630,7 +14631,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setmysettings" href="#setmysettings"><i class="anchor-icon"></i></a>setMySettings</h4>
-<p>Use this method to change settings of the bot. Settings that aren&#39;t specified remain unchanged. Returns <em>True</em> on success.</p>
+<p>Use this method to change the settings of the bot. Settings that aren&#39;t specified remain unchanged. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15065,7 +15066,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>for_channels</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to get default administrator rights of the bot in channels. Otherwise, default administrator rights of the bot for groups and supergroups will be returned.</td>
+<td>Pass <em>True</em> to get the default administrator rights of the bot in channels. Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.</td>
 </tr>
 </tbody>
 </table>
@@ -15289,12 +15290,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target bot or channel in the format <code>@username</code></td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="readbusinessmessage" href="#readbusinessmessage"><i class="anchor-icon"></i></a>readBusinessMessage</h4>
-<p>Marks incoming message as read on behalf of a business account. Requires the <em>can_read_messages</em> business bot right. Returns <em>True</em> on success.</p>
+<p>Marks an incoming message as read on behalf of a business account. Requires the <em>can_read_messages</em> business bot right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15326,7 +15327,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="deletebusinessmessages" href="#deletebusinessmessages"><i class="anchor-icon"></i></a>deleteBusinessMessages</h4>
-<p>Delete messages on behalf of a business account. Requires the <em>can_delete_sent_messages</em> business bot right to delete messages sent by the bot itself, or the <em>can_delete_all_messages</em> business bot right to delete any message. Returns <em>True</em> on success.</p>
+<p>Deletes messages on behalf of a business account. Requires the <em>can_delete_sent_messages</em> business bot right to delete messages sent by the bot itself, or the <em>can_delete_all_messages</em> business bot right to delete any message. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15352,7 +15353,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setbusinessaccountname" href="#setbusinessaccountname"><i class="anchor-icon"></i></a>setBusinessAccountName</h4>
-<p>Changes the first and last name of a managed business account. Requires the <em>can_change_name</em> business bot right. Returns <em>True</em> on success.</p>
+<p>Changes the first and last name of a managed business account. Requires the <em>can_edit_name</em> business bot right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15384,7 +15385,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setbusinessaccountusername" href="#setbusinessaccountusername"><i class="anchor-icon"></i></a>setBusinessAccountUsername</h4>
-<p>Changes the username of a managed business account. Requires the <em>can_change_username</em> business bot right. Returns <em>True</em> on success.</p>
+<p>Changes the username of a managed business account. Requires the <em>can_edit_username</em> business bot right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15410,7 +15411,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setbusinessaccountbio" href="#setbusinessaccountbio"><i class="anchor-icon"></i></a>setBusinessAccountBio</h4>
-<p>Changes the bio of a managed business account. Requires the <em>can_change_bio</em> business bot right. Returns <em>True</em> on success.</p>
+<p>Changes the bio of a managed business account. Requires the <em>can_edit_bio</em> business bot right. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15641,7 +15642,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>offset</td>
 <td>String</td>
 <td>Optional</td>
-<td>Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results</td>
+<td>Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results</td>
 </tr>
 <tr>
 <td>limit</td>
@@ -15879,12 +15880,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>star_count</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The amount of Telegram Stars that will be paid for the upgrade from the business account balance. If <code>gift.prepaid_upgrade_star_count &gt; 0</code>, then pass 0, otherwise, the <em>can_transfer_stars</em> business bot right is required and <code>gift.upgrade_star_count</code> must be passed.</td>
+<td>The amount of Telegram Stars that will be paid for the upgrade from the business account balance. If <code>gift.prepaid_upgrade_star_count &gt; 0</code>, then pass 0; otherwise, the <em>can_transfer_stars</em> business bot right is required and <code>gift.upgrade_star_count</code> must be passed.</td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="transfergift" href="#transfergift"><i class="anchor-icon"></i></a>transferGift</h4>
-<p>Transfers an owned unique gift to another user. Requires the <em>can_transfer_and_upgrade_gifts</em> business bot right. Requires <em>can_transfer_stars</em> business bot right if the transfer is paid. Returns <em>True</em> on success.</p>
+<p>Transfers an owned unique gift to another user. Requires the <em>can_transfer_and_upgrade_gifts</em> business bot right. Requires the <em>can_transfer_stars</em> business bot right if the transfer is paid. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15905,13 +15906,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>owned_gift_id</td>
 <td>String</td>
 <td>Yes</td>
-<td>Unique identifier of the regular gift that should be transferred</td>
+<td>Unique identifier of the unique gift that should be transferred</td>
 </tr>
 <tr>
 <td>new_owner_chat_id</td>
 <td>Integer</td>
 <td>Yes</td>
-<td>Unique identifier of the chat which will own the gift. The chat must be active in the last 24 hours.</td>
+<td>Unique identifier of the chat which will own the gift. The chat must have been active in the last 24 hours.</td>
 </tr>
 <tr>
 <td>star_count</td>
@@ -16253,9 +16254,9 @@ pre-formatted fixed-width code block written in the Python programming language
 <p>Methods and objects used in the inline mode are described in the <a href="#inline-mode">Inline mode section</a>.</p>
 <h3><a class="anchor" name="updating-messages" href="#updating-messages"><i class="anchor-icon"></i></a>Updating messages</h3>
 <p>The following methods allow you to change an existing message in the message history instead of sending a new one with a result of an action. This is most useful for messages with <a href="/bots/features#inline-keyboards">inline keyboards</a> using callback queries, but can also help reduce clutter in conversations with regular chat bots.</p>
-<p>Please note, that it is currently only possible to edit messages without <em>reply_markup</em> or with <a href="/bots/features#inline-keyboards">inline keyboards</a>.</p>
+<p>Please note that it is currently only possible to edit messages without <em>reply_markup</em> or with <a href="/bots/features#inline-keyboards">inline keyboards</a>.</p>
 <h4><a class="anchor" name="editmessagetext" href="#editmessagetext"><i class="anchor-icon"></i></a>editMessageText</h4>
-<p>Use this method to edit text, rich and <a href="#games">game</a> messages. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
+<p>Use this method to edit text, rich and <a href="#games">game</a> messages. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16318,7 +16319,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>rich_message</td>
 <td><a href="#inputrichmessage">InputRichMessage</a></td>
 <td>Optional</td>
-<td>New rich content of the message; required if <em>text</em> isn&#39;t specified. Direct upload of new files and explicit upload of files by a URL isn&#39;t supported when an inline message is edited.</td>
+<td>New rich content of the message; required if <em>text</em> isn&#39;t specified. Direct upload of new files and explicit upload of files by a URL aren&#39;t supported when an inline message is edited.</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -16329,7 +16330,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editmessagecaption" href="#editmessagecaption"><i class="anchor-icon"></i></a>editMessageCaption</h4>
-<p>Use this method to edit captions of messages. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
+<p>Use this method to edit captions of messages. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16386,7 +16387,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>show_caption_above_media</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the caption must be shown above the message media. Supported only for animation, photo and video messages.</td>
+<td>Pass <em>True</em> if the caption must be shown above the message media. Supported only for animation, live photo, paid media, photo, video and widget messages.</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -16397,7 +16398,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editmessagemedia" href="#editmessagemedia"><i class="anchor-icon"></i></a>editMessageMedia</h4>
-<p>Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with a media. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise. When an inline message is edited, a new file can&#39;t be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
+<p>Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with media. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise. When an inline message is edited, a new file can&#39;t be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16447,7 +16448,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editmessagelivelocation" href="#editmessagelivelocation"><i class="anchor-icon"></i></a>editMessageLiveLocation</h4>
-<p>Use this method to edit live location messages. A location can be edited until its <em>live_period</em> expires or editing is explicitly disabled by a call to <a href="#stopmessagelivelocation">stopMessageLiveLocation</a>. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned.</p>
+<p>Use this method to edit live location messages. A location can be edited until its <em>live_period</em> expires or editing is explicitly disabled by a call to <a href="#stopmessagelivelocation">stopMessageLiveLocation</a>. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16527,7 +16528,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="stopmessagelivelocation" href="#stopmessagelivelocation"><i class="anchor-icon"></i></a>stopMessageLiveLocation</h4>
-<p>Use this method to stop updating a live location message before <em>live_period</em> expires. On success, if the message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned.</p>
+<p>Use this method to stop updating a live location message before <em>live_period</em> expires. On success, if the message is not an inline message, the edited <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16586,7 +16587,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>business_connection_id</td>
 <td>String</td>
 <td>Yes</td>
-<td>Unique identifier of the business connection on behalf of which the message will be sent</td>
+<td>Unique identifier of the business connection on behalf of which the message to be edited was sent</td>
 </tr>
 <tr>
 <td>chat_id</td>
@@ -16691,7 +16692,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editmessagereplymarkup" href="#editmessagereplymarkup"><i class="anchor-icon"></i></a>editMessageReplyMarkup</h4>
-<p>Use this method to edit only the reply markup of messages. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
+<p>Use this method to edit only the reply markup of messages. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16936,7 +16937,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>show_caption_above_media</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the caption must be shown above the message media. Supported only for animation, photo and video messages.</td>
+<td>Pass <em>True</em> if the caption must be shown above the message media. Supported only for animation, live photo, photo and video messages.</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -17012,7 +17013,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>send_date</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>Point in time (Unix timestamp) when the post is expected to be published; omit if the date has already been specified when the suggested post was created. If specified, then the date must be not more than 2678400 seconds (30 days) in the future.</td>
+<td>Point in time (Unix timestamp) when the post is expected to be published; omit if the date has already been specified when the suggested post was created. If specified, then the date must not be more than 2678400 seconds (30 days) in the future.</td>
 </tr>
 </tbody>
 </table>
@@ -17049,7 +17050,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="deletemessage" href="#deletemessage"><i class="anchor-icon"></i></a>deleteMessage</h4>
-<p>Use this method to delete a message, including service messages, with the following limitations:<br>- A message can only be deleted if it was sent less than 48 hours ago.<br>- Service messages about a supergroup, channel, or forum topic creation can&#39;t be deleted.<br>- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.<br>- Bots can delete outgoing messages in private chats, groups, and supergroups.<br>- Bots can delete incoming messages in private chats.<br>- Bots granted <em>can_post_messages</em> permissions can delete outgoing messages in channels.<br>- If the bot is an administrator of a group, it can delete any message there.<br>- If the bot has <em>can_delete_messages</em> administrator right in a supergroup or a channel, it can delete any message there.<br>- If the bot has <em>can_manage_direct_messages</em> administrator right in a channel, it can delete any message in the corresponding direct messages chat.<br>Returns <em>True</em> on success.</p>
+<p>Use this method to delete a message, including service messages, with the following limitations:<br>- A message can only be deleted if it was sent less than 48 hours ago.<br>- Service messages about a supergroup, channel, or forum topic creation can&#39;t be deleted.<br>- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.<br>- Bots can delete outgoing messages in private chats, groups, and supergroups.<br>- Bots can delete incoming messages in private chats.<br>- Bots granted <em>can_post_messages</em> permissions can delete outgoing messages in channels.<br>- If the bot is an administrator of a group, it can delete any message there.<br>- If the bot has the <em>can_delete_messages</em> administrator right in a supergroup or a channel, it can delete any message there.<br>- If the bot has the <em>can_manage_direct_messages</em> administrator right in a channel, it can delete any message in the corresponding direct messages chat.<br>Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -17349,7 +17350,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>x_shift</td>
 <td>Float</td>
-<td>Shift by X-axis measured in widths of the mask scaled to the face size, from left to right. For example, choosing -1.0 will place mask just to the left of the default mask position.</td>
+<td>Shift by X-axis measured in widths of the mask scaled to the face size, from left to right. For example, choosing -1.0 will place the mask just to the left of the default mask position.</td>
 </tr>
 <tr>
 <td>y_shift</td>
@@ -17397,7 +17398,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>keywords</td>
 <td>Array of String</td>
-<td><em>Optional</em>. List of 0-20 search keywords for the sticker with total length of up to 64 characters. For “regular” and “custom_emoji” stickers only.</td>
+<td><em>Optional</em>. List of 0-20 search keywords for the sticker with a total length of up to 64 characters. For “regular” and “custom_emoji” stickers only.</td>
 </tr>
 </tbody>
 </table>
@@ -17785,7 +17786,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>keywords</td>
 <td>Array of String</td>
 <td>Optional</td>
-<td>A JSON-serialized list of 0-20 search keywords for the sticker with total length of up to 64 characters</td>
+<td>A JSON-serialized list of 0-20 search keywords for the sticker with a total length of up to 64 characters</td>
 </tr>
 </tbody>
 </table>
@@ -18119,7 +18120,7 @@ Intro with &lt;u&gt;underlined text&lt;/u&gt;, ==marked text==, and $x^2 + y^2$.
 <li>In media syntax, the optional title after the URL is used as the caption; for example, <img class="icon" src="url" alt="" title="Photo caption"> displays “Photo caption” under the media.</li>
 <li>Table cells can contain only inline formatting.</li>
 <li>Formula source is treated as raw LaTeX.</li>
-<li>Markdown isn&#39;t parsed inside block HTML tags other than &lt;details&gt;, &lt;tg-collage&gt; and &lt;tg-slideshow&gt;, therefore only HTML tags can be used there.</li>
+<li>Markdown isn&#39;t parsed inside block HTML tags other than &lt;details&gt;, &lt;tg-collage&gt; and &lt;tg-slideshow&gt;; therefore, only HTML tags can be used there.</li>
 <li>See <a href="#date-time-entity-formatting">date-time entity formatting</a> for more details about supported date-time formats.</li>
 </ul>
 <h6><a class="anchor" name="rich-html-style" href="#rich-html-style"><i class="anchor-icon"></i></a>Rich HTML style</h6>
@@ -18304,12 +18305,12 @@ all the text above was on the same line
 <tr>
 <td>html</td>
 <td>String</td>
-<td><em>Optional</em>. Content of the rich message to send described using HTML formatting. See <a href="#rich-message-formatting-options">rich message formatting options</a> for more details. Use <em>media</em> field to specify the media used in the message.</td>
+<td><em>Optional</em>. Content of the rich message to send described using HTML formatting. See <a href="#rich-message-formatting-options">rich message formatting options</a> for more details. Use the <em>media</em> field to specify the media used in the message.</td>
 </tr>
 <tr>
 <td>markdown</td>
 <td>String</td>
-<td><em>Optional</em>. Content of the rich message to send described using Markdown formatting. See <a href="#rich-message-formatting-options">rich message formatting options</a> for more details. Use <em>media</em> field to specify the media used in the message.</td>
+<td><em>Optional</em>. Content of the rich message to send described using Markdown formatting. See <a href="#rich-message-formatting-options">rich message formatting options</a> for more details. Use the <em>media</em> field to specify the media used in the message.</td>
 </tr>
 <tr>
 <td>media</td>
@@ -18367,7 +18368,7 @@ all the text above was on the same line
 <td>business_connection_id</td>
 <td>String</td>
 <td>Optional</td>
-<td>Unique identifier of the business connection on behalf of which the message will be sent. Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.</td>
+<td>Unique identifier of the business connection on behalf of which the message will be sent. The bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.</td>
 </tr>
 <tr>
 <td>chat_id</td>
@@ -18477,7 +18478,7 @@ all the text above was on the same line
 <td>rich_message</td>
 <td><a href="#inputrichmessage">InputRichMessage</a></td>
 <td>Yes</td>
-<td>The partial message to be streamed. Direct upload of new files and explicit upload of files by a URL isn&#39;t supported.</td>
+<td>The partial message to be streamed. Direct upload of new files and explicit upload of files by a URL aren&#39;t supported.</td>
 </tr>
 <tr>
 <td>can_stop</td>
@@ -19233,7 +19234,7 @@ all the text above was on the same line
 <tr>
 <td>anchor_name</td>
 <td>String</td>
-<td>The name of the anchor. If the name is empty, then the link brings back to the top of the message.</td>
+<td>The name of the anchor. If the name is empty, then the link brings the user back to the top of the message.</td>
 </tr>
 </tbody>
 </table>
@@ -19648,7 +19649,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="richblockexpandableblockquotation" href="#richblockexpandableblockquotation"><i class="anchor-icon"></i></a>RichBlockExpandableBlockQuotation</h4>
-<p>A block quotation, corresponding to the HTML tag <code>&lt;blockquote&gt;</code> with custom attribute <code>&quot;expandable&quot;</code>.</p>
+<p>A block quotation, corresponding to the HTML tag <code>&lt;blockquote&gt;</code> with the custom attribute <code>&quot;expandable&quot;</code>.</p>
 <table class="table">
 <thead>
 <tr>
@@ -20090,7 +20091,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="richblockthinking" href="#richblockthinking"><i class="anchor-icon"></i></a>RichBlockThinking</h4>
-<p>A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <code>&lt;tg-thinking&gt;</code>. The block may be used only in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>, therefore it can&#39;t be received in messages. See <a href="https://t.me/addemoji/AIActions"><a href="https://t.me/addemoji/AIActions">https://t.me/addemoji/AIActions</a></a> for examples of custom emoji that are recommended for usage in the block.</p>
+<p>A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <code>&lt;tg-thinking&gt;</code>. The block may be used only in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>; therefore, it can&#39;t be received in messages. See <a href="https://t.me/addemoji/AIActions"><a href="https://t.me/addemoji/AIActions">https://t.me/addemoji/AIActions</a></a> for examples of custom emoji that are recommended for usage in the block.</p>
 <table class="table">
 <thead>
 <tr>
@@ -20396,7 +20397,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inputrichblockexpandableblockquotation" href="#inputrichblockexpandableblockquotation"><i class="anchor-icon"></i></a>InputRichBlockExpandableBlockQuotation</h4>
-<p>A block quotation, corresponding to the HTML tag <code>&lt;blockquote&gt;</code> with custom attribute <code>&quot;expandable&quot;</code>.</p>
+<p>A block quotation, corresponding to the HTML tag <code>&lt;blockquote&gt;</code> with the custom attribute <code>&quot;expandable&quot;</code>.</p>
 <table class="table">
 <thead>
 <tr>
@@ -20823,7 +20824,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inputrichblockthinking" href="#inputrichblockthinking"><i class="anchor-icon"></i></a>InputRichBlockThinking</h4>
-<p>A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <code>&lt;tg-thinking&gt;</code>. The block may be used only in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>, therefore it can&#39;t be received in messages. See <a href="https://t.me/addemoji/AIActions"><a href="https://t.me/addemoji/AIActions">https://t.me/addemoji/AIActions</a></a> for examples of custom emoji that are recommended for usage in the block.</p>
+<p>A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <code>&lt;tg-thinking&gt;</code>. The block may be used only in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>; therefore, it can&#39;t be received in messages. See <a href="https://t.me/addemoji/AIActions"><a href="https://t.me/addemoji/AIActions">https://t.me/addemoji/AIActions</a></a> for examples of custom emoji that are recommended for usage in the block.</p>
 <table class="table">
 <thead>
 <tr>
@@ -20882,7 +20883,7 @@ all the text above was on the same line
 <tr>
 <td>chat_type</td>
 <td>String</td>
-<td><em>Optional</em>. Type of the chat from which the inline query was sent. Can be either “sender” for a private chat with the inline query sender, “private”, “group”, “supergroup”, or “channel”. The chat type should be always known for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat.</td>
+<td><em>Optional</em>. Type of the chat from which the inline query was sent. Can be either “sender” for a private chat with the inline query sender, “private”, “group”, “supergroup”, or “channel”. The chat type should always be known for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat.</td>
 </tr>
 <tr>
 <td>location</td>
@@ -21058,7 +21059,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinequeryresultphoto" href="#inlinequeryresultphoto"><i class="anchor-icon"></i></a>InlineQueryResultPhoto</h4>
-<p>Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the photo.</p>
+<p>Represents a link to a photo. By default, this photo will be sent by the user with an optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the photo.</p>
 <table class="table">
 <thead>
 <tr>
@@ -21141,7 +21142,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinequeryresultgif" href="#inlinequeryresultgif"><i class="anchor-icon"></i></a>InlineQueryResultGif</h4>
-<p>Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the animation.</p>
+<p>Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with an optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the animation.</p>
 <table class="table">
 <thead>
 <tr>
@@ -21229,7 +21230,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinequeryresultmpeg4gif" href="#inlinequeryresultmpeg4gif"><i class="anchor-icon"></i></a>InlineQueryResultMpeg4Gif</h4>
-<p>Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the animation.</p>
+<p>Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with an optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the animation.</p>
 <table class="table">
 <thead>
 <tr>
@@ -21408,7 +21409,7 @@ all the text above was on the same line
 <tr>
 <td>input_message_content</td>
 <td><a href="#inputmessagecontent">InputMessageContent</a></td>
-<td><em>Optional</em>. Content of the message to be sent instead of the video. This field is <strong>required</strong> if InlineQueryResultVideo is used to send an HTML-page as a result (e.g., a YouTube video).</td>
+<td><em>Optional</em>. Content of the message to be sent instead of the video. This field is <strong>required</strong> if InlineQueryResultVideo is used to send an HTML page as a result (e.g., a YouTube video).</td>
 </tr>
 </tbody>
 </table>
@@ -21481,7 +21482,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinequeryresultvoice" href="#inlinequeryresultvoice"><i class="anchor-icon"></i></a>InlineQueryResultVoice</h4>
-<p>Represents a link to a voice recording in an .OGG container encoded with OPUS. By default, this voice recording will be sent by the user. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the the voice message.</p>
+<p>Represents a link to a voice recording in an .OGG container encoded with OPUS. By default, this voice recording will be sent by the user. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the voice message.</p>
 <table class="table">
 <thead>
 <tr>
@@ -21967,7 +21968,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinequeryresultcachedgif" href="#inlinequeryresultcachedgif"><i class="anchor-icon"></i></a>InlineQueryResultCachedGif</h4>
-<p>Represents a link to an animated GIF file stored on the Telegram servers. By default, this animated GIF file will be sent by the user with an optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with specified content instead of the animation.</p>
+<p>Represents a link to an animated GIF file stored on the Telegram servers. By default, this animated GIF file will be sent by the user with an optional caption. Alternatively, you can use <em>input_message_content</em> to send a message with the specified content instead of the animation.</p>
 <table class="table">
 <thead>
 <tr>
@@ -22588,7 +22589,7 @@ all the text above was on the same line
 <tr>
 <td>payload</td>
 <td>String</td>
-<td>Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.</td>
+<td>Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user; use it for your internal processes.</td>
 </tr>
 <tr>
 <td>provider_token</td>
@@ -22608,12 +22609,12 @@ all the text above was on the same line
 <tr>
 <td>max_tip_amount</td>
 <td>Integer</td>
-<td><em>Optional</em>. The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
+<td><em>Optional</em>. The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>suggested_tip_amounts</td>
 <td>Array of Integer</td>
-<td><em>Optional</em>. A JSON-serialized Array of suggested amounts of tip in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed <em>max_tip_amount</em>.</td>
+<td><em>Optional</em>. A JSON-serialized Array of suggested amounts of tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed <em>max_tip_amount</em>.</td>
 </tr>
 <tr>
 <td>provider_data</td>
@@ -22817,7 +22818,7 @@ all the text above was on the same line
 <tr>
 <td>inline_message_id</td>
 <td>String</td>
-<td><em>Optional</em>. Identifier of the sent inline message. Available only if there is an <a href="#inlinekeyboardmarkup">inline keyboard</a> attached to the message. Will be also received in <a href="#callbackquery">callback queries</a> and can be used to <a href="#updating-messages">edit</a> the message.</td>
+<td><em>Optional</em>. Identifier of the sent inline message. Available only if there is an <a href="#inlinekeyboardmarkup">inline keyboard</a> attached to the message. Will also be received in <a href="#callbackquery">callback queries</a> and can be used to <a href="#updating-messages">edit</a> the message.</td>
 </tr>
 <tr>
 <td>query</td>
@@ -22875,7 +22876,7 @@ all the text above was on the same line
 <td>payload</td>
 <td>String</td>
 <td>Yes</td>
-<td>Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.</td>
+<td>Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user; use it for your internal processes.</td>
 </tr>
 <tr>
 <td>provider_token</td>
@@ -22899,13 +22900,13 @@ all the text above was on the same line
 <td>max_tip_amount</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
+<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>suggested_tip_amounts</td>
 <td>Array of Integer</td>
 <td>Optional</td>
-<td>A JSON-serialized Array of suggested amounts of tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed <em>max_tip_amount</em>.</td>
+<td>A JSON-serialized Array of suggested amounts of tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed <em>max_tip_amount</em>.</td>
 </tr>
 <tr>
 <td>start_parameter</td>
@@ -22917,7 +22918,7 @@ all the text above was on the same line
 <td>provider_data</td>
 <td>String</td>
 <td>Optional</td>
-<td>JSON-serialized data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.</td>
+<td>JSON-serialized data about the invoice, which will be shared with the payment provider. A detailed description of the required fields should be provided by the payment provider.</td>
 </tr>
 <tr>
 <td>photo_url</td>
@@ -23063,7 +23064,7 @@ all the text above was on the same line
 <td>payload</td>
 <td>String</td>
 <td>Yes</td>
-<td>Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.</td>
+<td>Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user; use it for your internal processes.</td>
 </tr>
 <tr>
 <td>provider_token</td>
@@ -23087,25 +23088,25 @@ all the text above was on the same line
 <td>subscription_period</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 10000 Telegram Stars.</td>
+<td>The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must not exceed 10000 Telegram Stars.</td>
 </tr>
 <tr>
 <td>max_tip_amount</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
+<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>suggested_tip_amounts</td>
 <td>Array of Integer</td>
 <td>Optional</td>
-<td>A JSON-serialized Array of suggested amounts of tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed <em>max_tip_amount</em>.</td>
+<td>A JSON-serialized Array of suggested amounts of tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed <em>max_tip_amount</em>.</td>
 </tr>
 <tr>
 <td>provider_data</td>
 <td>String</td>
 <td>Optional</td>
-<td>JSON-serialized data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.</td>
+<td>JSON-serialized data about the invoice, which will be shared with the payment provider. A detailed description of the required fields should be provided by the payment provider.</td>
 </tr>
 <tr>
 <td>photo_url</td>
@@ -23209,7 +23210,7 @@ all the text above was on the same line
 <td>error_message</td>
 <td>String</td>
 <td>Optional</td>
-<td>Required if <em>ok</em> is <em>False</em>. Error message in human readable form that explains why it is impossible to complete the order (e.g. “Sorry, delivery to your desired address is unavailable”). Telegram will display this message to the user.</td>
+<td>Required if <em>ok</em> is <em>False</em>. Error message in human-readable form that explains why it is impossible to complete the order (e.g. “Sorry, delivery to your desired address is unavailable”). Telegram will display this message to the user.</td>
 </tr>
 </tbody>
 </table>
@@ -23241,7 +23242,7 @@ all the text above was on the same line
 <td>error_message</td>
 <td>String</td>
 <td>Optional</td>
-<td>Required if <em>ok</em> is <em>False</em>. Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g. &quot;Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details. Please choose a different color or garment!&quot;). Telegram will display this message to the user.</td>
+<td>Required if <em>ok</em> is <em>False</em>. Error message in human-readable form that explains the reason for failure to proceed with the checkout (e.g. &quot;Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details. Please choose a different color or garment!&quot;). Telegram will display this message to the user.</td>
 </tr>
 </tbody>
 </table>
@@ -23350,7 +23351,7 @@ all the text above was on the same line
 <tr>
 <td>amount</td>
 <td>Integer</td>
-<td>Price of the product in the <em>smallest units</em> of the <a href="/bots/payments#supported-currencies">currency</a> (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
+<td>Price of the product in the <em>smallest units</em> of the <a href="/bots/payments#supported-currencies">currency</a> (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
 </tr>
 </tbody>
 </table>
@@ -23388,7 +23389,7 @@ all the text above was on the same line
 <tr>
 <td>total_amount</td>
 <td>Integer</td>
-<td>Total price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
+<td>Total price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code>, <code>total_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
 </tr>
 </tbody>
 </table>
@@ -23515,7 +23516,7 @@ all the text above was on the same line
 <tr>
 <td>total_amount</td>
 <td>Integer</td>
-<td>Total price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
+<td>Total price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code>, <code>total_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
 </tr>
 <tr>
 <td>invoice_payload</td>
@@ -23578,7 +23579,7 @@ all the text above was on the same line
 <tr>
 <td>total_amount</td>
 <td>Integer</td>
-<td>Total refunded price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code>, <code>total_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
+<td>Total refunded price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code>, <code>total_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
 </tr>
 <tr>
 <td>invoice_payload</td>
@@ -23626,7 +23627,7 @@ all the text above was on the same line
 <tr>
 <td>shipping_address</td>
 <td><a href="#shippingaddress">ShippingAddress</a></td>
-<td>User specified shipping address</td>
+<td>User-specified shipping address</td>
 </tr>
 </tbody>
 </table>
@@ -23659,7 +23660,7 @@ all the text above was on the same line
 <tr>
 <td>total_amount</td>
 <td>Integer</td>
-<td>Total price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
+<td>Total price in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a price of <code>US$ 1.45</code>, <code>total_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</td>
 </tr>
 <tr>
 <td>invoice_payload</td>
@@ -24099,7 +24100,7 @@ all the text above was on the same line
 <tr>
 <td>data</td>
 <td>Array of <a href="#encryptedpassportelement">EncryptedPassportElement</a></td>
-<td>Array with information about documents and other Telegram Passport elements that was shared with the bot</td>
+<td>Array with information shared with the bot about documents and other Telegram Passport elements</td>
 </tr>
 <tr>
 <td>credentials</td>
@@ -24233,7 +24234,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="setpassportdataerrors" href="#setpassportdataerrors"><i class="anchor-icon"></i></a>setPassportDataErrors</h4>
-<p>Informs a user that some of the Telegram Passport elements they provided contains errors. The user will not be able to re-submit their Passport to you until the errors are fixed (the contents of the field for which you returned the error must change). Returns <em>True</em> on success.</p>
+<p>Informs a user that some of the Telegram Passport elements they provided contain errors. The user will not be able to re-submit their Passport to you until the errors are fixed (the contents of the field for which you returned the error must change). Returns <em>True</em> on success.</p>
 <p>Use this if the data submitted by the user doesn&#39;t satisfy the standards your service requires for any reason. For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc. Supply some details in the error message to make sure the user knows how to correct the issues.</p>
 <table class="table">
 <thead>
@@ -24344,7 +24345,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="passportelementerrorreverseside" href="#passportelementerrorreverseside"><i class="anchor-icon"></i></a>PassportElementErrorReverseSide</h4>
-<p>Represents an issue with the reverse side of a document. The error is considered resolved when the file with reverse side of the document changes.</p>
+<p>Represents an issue with the reverse side of a document. The error is considered resolved when the file with the reverse side of the document changes.</p>
 <table class="table">
 <thead>
 <tr>
@@ -24509,7 +24510,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="passportelementerrortranslationfiles" href="#passportelementerrortranslationfiles"><i class="anchor-icon"></i></a>PassportElementErrorTranslationFiles</h4>
-<p>Represents an issue with the translated version of a document. The error is considered resolved when a file with the document translation change.</p>
+<p>Represents an issue with the translated version of a document. The error is considered resolved when a file with the document translation changes.</p>
 <table class="table">
 <thead>
 <tr>
@@ -24582,7 +24583,7 @@ all the text above was on the same line
 <li>If you send the game message without any buttons, it will automatically have a &#39;Play <em>GameName</em>&#39; button. When this button is pressed, your bot gets a <a href="#callbackquery">CallbackQuery</a> with the <em>game_short_name</em> of the requested game. You provide the correct URL for this particular user and the app opens the game in the in-app browser.</li>
 <li>You can manually add multiple buttons to your game message. Please note that the first button in the first row <strong>must always</strong> launch the game, using the field <em>callback_game</em> in <a href="#inlinekeyboardbutton">InlineKeyboardButton</a>. You can add extra buttons according to taste: e.g., for a description of the rules, or to open the game&#39;s official community.</li>
 <li>To make your game more attractive, you can upload a GIF animation that demonstrates the game to the users via <a href="https://t.me/botfather">BotFather</a> (see <a href="https://t.me/gamebot?game=lumberjack">Lumberjack</a> for example).</li>
-<li>A game message will also display high scores for the current chat. Use <a href="#setgamescore">setGameScore</a> to post high scores to the chat with the game, add the <em>disable_edit_message</em> parameter to disable automatic update of the message with the current scoreboard.</li>
+<li>A game message will also display high scores for the current chat. Use <a href="#setgamescore">setGameScore</a> to post high scores to the chat with the game; add the <em>disable_edit_message</em> parameter to disable automatic update of the message with the current scoreboard.</li>
 <li>Use <a href="#getgamehighscores">getGameHighScores</a> to get data for in-game high score tables.</li>
 <li>You can also add an extra <a href="/bots/games#sharing-your-game-to-telegram-chats">sharing button</a> for users to share their best score to different chats.</li>
 <li>For examples of what can be done using this new stuff, check the <a href="https://t.me/gamebot">@gamebot</a> and <a href="https://t.me/gamee">@gamee</a> bots.</li>
@@ -24662,7 +24663,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="game" href="#game"><i class="anchor-icon"></i></a>Game</h4>
-<p>This object represents a game. Use BotFather to create and edit games, their short names will act as unique identifiers.</p>
+<p>This object represents a game. Use BotFather to create and edit games; their short names will act as unique identifiers.</p>
 <table class="table">
 <thead>
 <tr>
@@ -24707,7 +24708,7 @@ all the text above was on the same line
 <h4><a class="anchor" name="callbackgame" href="#callbackgame"><i class="anchor-icon"></i></a>CallbackGame</h4>
 <p>A placeholder, currently holds no information. Use <a href="https://t.me/botfather">BotFather</a> to set up your game.</p>
 <h4><a class="anchor" name="setgamescore" href="#setgamescore"><i class="anchor-icon"></i></a>setGameScore</h4>
-<p>Use this method to set the score of the specified user in a game message. On success, if the message is not an inline message, the <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Returns an error, if the new score is not greater than the user&#39;s current score in the chat and <em>force</em> is <em>False</em>.</p>
+<p>Use this method to set the score of the specified user in a game message. On success, if the message is not an inline message, the <a href="#message">Message</a> is returned; otherwise, <em>True</em> is returned. Returns an error if the new score is not greater than the user&#39;s current score in the chat and <em>force</em> is <em>False</em>.</p>
 <table class="table">
 <thead>
 <tr>
