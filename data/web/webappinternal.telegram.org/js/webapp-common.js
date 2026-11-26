@@ -1,14 +1,14 @@
 window.WebApp = window.Telegram && window.Telegram.WebApp || null;
 
 var TWebApp = {
-  init(basePath = '') {
+  init(basePath = '', options = {}) {
     if (basePath) {
       var hash = Aj.apiUrl.split('hash=')[1] || '';
       Aj.apiUrl = basePath + '/api?hash=' + hash;
       window.basePath = basePath;
     }
     TWebApp.initOnce();
-    Aj.viewTransition = true;
+    Aj.viewTransition = options.viewTransition !== false;
 
     $('form').on('submit', e => e.preventDefault());
     TBackButton.update();
